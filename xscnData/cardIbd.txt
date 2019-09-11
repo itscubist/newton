@@ -1,0 +1,52 @@
+# Card File For Inverse Beta Decay, Information Describing the Interaction is Here
+# Tells Where to find Xscn Files, Number of Excited States
+# Which Types of Neutrinos Interact This Way...
+# --- Means Not Existing
+# Name
+XSCN_NAME IBD
+# How many targets in a molecule in different materials (2 free proton per H2O, 0 for D2O)
+WATERPERMOLECULE 2
+HEAVYWATERPERMOLECULE 0
+# Possible Number of Final States
+FINALSTATES 1
+# Target PDG No
+PDGT 2212
+# Final Hadron PDG No (0 if notexistent)
+PDGF 2112
+# Final Charged Lepton PDG No (0 if not existent)
+PDGL -11
+# Target PDG No
+MT 938.272
+# Final Hadron Mass (0 if not existent)
+MF 939.565
+# Final Charged Lepton Mass (0 if not existent or neutrino)
+ML 0.511
+# Whether write the particle MF in output (no need to write undetectable particles)
+WRITE_F 1
+# Whether follow the decay chain of excited states (for MF)
+DECAY_F 0
+# Which neutrinos do this interaction
+NUE 0
+NUEBAR 1
+NUMU 0
+NUMUBAR 0
+NUTAU 0
+NUTAUBAR 0
+# Is Double Differential Info Supplied
+DOUBLEDIFF 1
+# Angular Bins [cos(thethaNue)] Supplied
+ANGBINS 20
+# Energy Bins Supplied (How many rows of info)
+ENERGYBINS 200
+# Is Excitation Energies Supplied
+EXCDATA 0
+# Xscn vs Energy
+XSCNDATA xscnData/ibdxscn.txt
+# Excited State Info File (Excitation Energy, Nuclear Spin, Parity)
+EXCLEVELDATA ---
+# Probability of Excitation
+EXCPROBDATA ---
+# Angular Xscn Data per Final State (so 01 is final state with lowest energy...)
+# Expected to have a file for each excited state and in order!!!
+01_ANGXSCNDATA xscnData/ibdxscnDoubleDiff.txt
+
