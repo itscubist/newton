@@ -1,0 +1,92 @@
+# Card File For Nue-16O, Information Describing the Interaction is Here
+# Tells Where to find Xscn Files, Number of Excited States
+# Which Types of Neutrinos Interact This Way...
+# --- Means Not Existing
+# Name
+XSCN_NAME NUE-O16
+# How many targets in a molecule in different materials (2 free proton per H2O, 0 for D2O)
+WATERPERMOLECULE 1
+HEAVYWATERPERMOLECULE 1
+# Possible Number of Final States
+FINALSTATES 42
+# Target PDG No
+PDGT 111111
+# Final Hadron PDG No (0 if notexistent)
+PDGF 111112
+# Final Charged Lepton PDG No (0 if not existent)
+PDGL 11
+# Target PDG Mass
+MT 14899.2
+# Final Hadron Mass (0 if not existent)
+MF 14914.1
+# Final Charged Lepton Mass (0 if not existent or neutrino)
+ML 0.511
+# Whether write the particle MF in output (no need to write undetectable particles)
+WRITE_F 0
+# Whether follow the decay chain of excited states (for MF)
+DECAY_F 1
+# Which neutrinos do this interaction
+NUE 1
+NUEBAR 0
+NUMU 0
+NUMUBAR 0
+NUTAU 0
+NUTAUBAR 0
+# Is Double Differential Info Supplied
+DOUBLEDIFF 1
+# Angular Bins [cos(thethaNue)] Supplied
+ANGBINS 20
+# Energy Bins Supplied (How many rows of info)
+ENERGYBINS 115
+# Is Excitation Energies Supplied
+EXCDATA 1
+# Xscn vs Energy
+XSCNDATA xscnData/nueO16xscn.txt
+# Excited State Info File (Excitation Energy, Nuclear Spin, Parity)
+EXCLEVELDATA xscnData/nueOxygenExcitedStates.txt
+# Probability of Excitation
+EXCPROBDATA xscnData/nueO16exProb.txt
+# Angular Xscn Data per Final State (so 01 is final state with lowest energy...)
+# Expected to have a file for each excited state and in order!!!
+01_ANGXSCNDATA xscnData/nueO16_ex1.txt
+02_ANGXSCNDATA xscnData/nueO16_ex2.txt
+03_ANGXSCNDATA xscnData/nueO16_ex3.txt
+04_ANGXSCNDATA xscnData/nueO16_ex4.txt
+05_ANGXSCNDATA xscnData/nueO16_ex5.txt
+06_ANGXSCNDATA xscnData/nueO16_ex6.txt
+07_ANGXSCNDATA xscnData/nueO16_ex7.txt
+08_ANGXSCNDATA xscnData/nueO16_ex8.txt
+09_ANGXSCNDATA xscnData/nueO16_ex9.txt
+10_ANGXSCNDATA xscnData/nueO16_ex10.txt
+11_ANGXSCNDATA xscnData/nueO16_ex11.txt
+12_ANGXSCNDATA xscnData/nueO16_ex12.txt
+13_ANGXSCNDATA xscnData/nueO16_ex13.txt
+14_ANGXSCNDATA xscnData/nueO16_ex14.txt
+15_ANGXSCNDATA xscnData/nueO16_ex15.txt
+16_ANGXSCNDATA xscnData/nueO16_ex16.txt
+17_ANGXSCNDATA xscnData/nueO16_ex17.txt
+18_ANGXSCNDATA xscnData/nueO16_ex18.txt
+19_ANGXSCNDATA xscnData/nueO16_ex19.txt
+20_ANGXSCNDATA xscnData/nueO16_ex20.txt
+21_ANGXSCNDATA xscnData/nueO16_ex21.txt
+22_ANGXSCNDATA xscnData/nueO16_ex22.txt
+23_ANGXSCNDATA xscnData/nueO16_ex23.txt
+24_ANGXSCNDATA xscnData/nueO16_ex24.txt
+25_ANGXSCNDATA xscnData/nueO16_ex25.txt
+26_ANGXSCNDATA xscnData/nueO16_ex26.txt
+27_ANGXSCNDATA xscnData/nueO16_ex27.txt
+28_ANGXSCNDATA xscnData/nueO16_ex28.txt
+29_ANGXSCNDATA xscnData/nueO16_ex29.txt
+30_ANGXSCNDATA xscnData/nueO16_ex30.txt
+31_ANGXSCNDATA xscnData/nueO16_ex31.txt
+32_ANGXSCNDATA xscnData/nueO16_ex32.txt
+33_ANGXSCNDATA xscnData/nueO16_ex33.txt
+34_ANGXSCNDATA xscnData/nueO16_ex34.txt
+35_ANGXSCNDATA xscnData/nueO16_ex35.txt
+36_ANGXSCNDATA xscnData/nueO16_ex36.txt
+37_ANGXSCNDATA xscnData/nueO16_ex37.txt
+38_ANGXSCNDATA xscnData/nueO16_ex38.txt
+39_ANGXSCNDATA xscnData/nueO16_ex39.txt
+40_ANGXSCNDATA xscnData/nueO16_ex40.txt
+41_ANGXSCNDATA xscnData/nueO16_ex41.txt
+42_ANGXSCNDATA xscnData/nueO16_ex42.txt

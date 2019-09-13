@@ -7,19 +7,21 @@ OBJDIR = obj
 EXECDIR = .
 TARGET = newtonTest
 
+# Enable Root Usage and Include
 CXXFLAGS = `root-config --libs --cflags` -I$(INCDIR)
 
-DEPS = $(find $(INCDIR) -name '*.h')
- 
+#DEPS = $(find $(INCDIR) -name '*.h')
+DEPS = xscn.h flux.h detector.h event.h global.h
+
 #SRC = $(find $(SRCDIR)/ -name '*.cc')
-SRC = newtonTest.cc
+SRC = newtonTest.cc xscn.cc flux.cc detector.cc event.cc
 
 OBJS = $(SRC:%.cc=$(OBJDIR)/%.o)
 
 all: $(TARGET)
 
-$(OBJDIR)/%.o : $(SRCDIR)/%.cc $(DEPS)
-	$(CXX) -c -o $@ $< $(CXXFLAGS)
+$(OBJDIR)/%.o : $(SRCDIR)/%.cc
+	$(CXX) -c -o $@ $^ $(CXXFLAGS)
 
 $(TARGET) : $(OBJS) 
 	$(CXX) $^ -o $@ $(CXXFLAGS)
@@ -27,4 +29,4 @@ $(TARGET) : $(OBJS)
 .PHONY: clean
 
 clean:
-	rm -f $(OBJDIR)/*.o *~ core $(INCDIR)/*~ 
+	rm -f $(OBJDIR)/*.o *~ core 

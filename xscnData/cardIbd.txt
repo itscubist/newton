@@ -49,4 +49,3 @@ EXCPROBDATA ---
 # Angular Xscn Data per Final State (so 01 is final state with lowest energy...)
 # Expected to have a file for each excited state and in order!!!
 01_ANGXSCNDATA xscnData/ibdxscnDoubleDiff.txt
-
