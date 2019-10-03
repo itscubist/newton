@@ -29,6 +29,7 @@
 #include "flux.h"
 #include "detector.h"
 #include "event.h"
+#include "exstates.h"
 
 using namespace std;
 using namespace TMath;
@@ -41,33 +42,39 @@ int main(int argc, const char *argv[]) {
 		cout <<"Usage: ./newtonTest "<< endl;
 		return 0;
 	} // end of usage printing statement
-
+	
+	// Outfile and detector
 	TFile* outFile = new TFile("newtonTestOut.root","RECREATE");
 	Detector superK("detData/cardSuperK.txt",outFile);
+	// Xscns
+	unsigned int nXscn = 7;
 	Xscn ibdXscn("xscnData/cardIbd.txt",superK.material,outFile);
 	Xscn nueOXscn("xscnData/cardNueO16.txt",superK.material,outFile);
 	Xscn nuebarOXscn("xscnData/cardNuebarO16.txt",superK.material,outFile);
+	Xscn nueEs("xscnData/cardNueEs.txt",superK.material,outFile);
+	Xscn nuebarEs("xscnData/cardNuebarEs.txt",superK.material,outFile);
+	Xscn nuxEs("xscnData/cardNuxEs.txt",superK.material,outFile);
+	Xscn nuxbarEs("xscnData/cardNuxbarEs.txt",superK.material,outFile);
+	
+	Xscn *activeXscns[nXscn] = {&ibdXscn, &nueOXscn, &nuebarOXscn, 
+		&nueEs,&nuebarEs,&nuxEs,&nuxbarEs};
+	TString xscnNames[nXscn] = {"ibd","nueO16","nuebarO16","nueEs","nuebarEs","nuxEs","nuxbarEs"};
+
+	// FLux
 	Flux atmFlux("fluxData/cardAtmospheric.txt",outFile);
-	cout << "Constructed Flux" << endl;
-	int ibdCount = ibdXscn.generateEventCountPerEnergy(atmFlux, superK);
-	int nueOCount = nueOXscn.generateEventCountPerEnergy(atmFlux, superK);
-	int nuebarOCount = nuebarOXscn.generateEventCountPerEnergy(atmFlux, superK);
-	cout << "Total IBD Events: " << ibdCount << endl; 
-	cout << "Total nue-O16 Events: " << nueOCount << endl; 
-	cout << "Total nuebar-O16 Events: " << nuebarOCount << endl; 
-	// testing
+	// Convolve Flux and Xscns
+	int xscnCounts[nXscn];
+	for (int xCtr = 0; xCtr < nXscn; xCtr ++) {
+		xscnCounts[xCtr] = 	activeXscns[xCtr]->generateEventCountPerEnergy(atmFlux, superK);
+		cout << "Total " << xscnNames[xCtr] << " Events: " << xscnCounts[xCtr] << endl;
+		activeXscns[xCtr]->xscnVsEnergy->Write();	
+		activeXscns[xCtr]->xscnVsEnergyAngle[0]->Write();
+		activeXscns[xCtr]->eventsVsEnergy->Write();
+	}
+	// Some Testing
 	for (int i = 0; i < 6; i++) atmFlux.fluxVsEnergy[i]->Write();
-	ibdXscn.xscnVsEnergy->Write();
-	ibdXscn.xscnVsEnergyAngle[0]->Write();
-	ibdXscn.eventsVsEnergy->Write();
-	nueOXscn.xscnVsEnergy->Write();
-	nuebarOXscn.xscnVsEnergy->Write();
-	nueOXscn.xscnVsEnergyAngle[0]->Write();
-	nuebarOXscn.xscnVsEnergyAngle[0]->Write();
 	nueOXscn.excProbVsEnergy->Write();
 	nuebarOXscn.excProbVsEnergy->Write();
-	nueOXscn.eventsVsEnergy->Write();
-	nuebarOXscn.eventsVsEnergy->Write();
 
 	/*Event ev2(50,nuebarOXscn,atmFlux,superK);
 	Event ev(50,nuebarOXscn,atmFlux,superK);
@@ -75,32 +82,38 @@ int main(int argc, const char *argv[]) {
 	cout << "Electron Energy: " << ev.particles[0].energy << endl;
 */
 	vector<Event> genEvents;
-	unsigned int nXscn = 3;
-	TString hAziNames[nXscn] = {"ibdAzi","nueOAzi","nuebarOAzi"};
-	TString hZenNames[nXscn] = {"ibdZen","nueOZen","nuebarOZen"};
-	TString hZENames[nXscn] = {"ibdZE","nueOZE","nuebarOZE"};
+	TString aziName = "hAzi_";
+	TString zenName = "hZen_";
+	TString ezName = "hEZ_ ";
 	TH1D* hAzi[nXscn], *hZen[nXscn];
-	Xscn *activeXscns[nXscn] = {&ibdXscn, &nueOXscn, &nuebarOXscn};
 	for (unsigned int xCtr = 0; xCtr < nXscn; xCtr++) {
+		cout << "Xscn: " << xscnNames[xCtr] << endl; // Print Xscn
 		for (unsigned int eCtr = 0; eCtr < activeXscns[xCtr]->genEnergies.size(); eCtr++) {
-				Event tempEvent(activeXscns[xCtr]->genEnergies[eCtr],*activeXscns[xCtr],atmFlux,superK);
-				genEvents.push_back(tempEvent);
-				double tempCosZen = tempEvent.particles[0].direction.CosTheta();
-				double tempAzi = tempEvent.particles[0].direction.Phi()*RadToDeg();
-				if(tempAzi<0) tempAzi+=360.0;
-				double tempEne = tempEvent.particles[0].energy;
-				activeXscns[xCtr]->leptonDirEnergyDist->Fill(tempCosZen,tempAzi,tempEne);
+			Event tempEvent(activeXscns[xCtr]->genEnergies[eCtr],*activeXscns[xCtr],atmFlux,superK);
+			if(tempEvent.xscnExState>0) { // Add gamma
+				tempEvent.addParticle(22,activeXscns[xCtr]->excLevels[tempEvent.xscnExState].energyGnd,0);	
+			}
+			genEvents.push_back(tempEvent);
+			double tempCosZen = tempEvent.particles[0].direction.CosTheta();
+			double tempAzi = tempEvent.particles[0].direction.Phi()*RadToDeg();
+			if(tempAzi<0) tempAzi+=360.0;
+			double tempEne = tempEvent.particles[0].energy;
+			// Fill TH3D of electron
+			activeXscns[xCtr]->leptonDirEnergyDist->Fill(tempCosZen,tempAzi,tempEne);
 		}
 		activeXscns[xCtr]->leptonDirEnergyDist->Write();
 		hZen[xCtr] = activeXscns[xCtr]->leptonDirEnergyDist->
-				ProjectionX(hZenNames[xCtr],1,12,30,100,"e");
+				ProjectionX(zenName + xscnNames[xCtr],1,12,30,100,"e");
 		hZen[xCtr]->Write();		
 		hAzi[xCtr] = activeXscns[xCtr]->leptonDirEnergyDist->
-				ProjectionY(hAziNames[xCtr],10,11,30,100,"e");
+				ProjectionY(aziName+xscnNames[xCtr],10,11,30,100,"e");
 		hAzi[xCtr]->Write();
 
 	}
-		
+	// out Kinematic File
+	ofstream outText("newtonTest.kin");
+	for (int eCtr = 0; eCtr < genEvents.size(); eCtr++) genEvents[eCtr].writeEvent(outText);
+	outText.close();
 	
 	// Testing
 	//cout << "Overall Coefficient: " << superK.overallCoeff << endl;

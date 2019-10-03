@@ -40,7 +40,17 @@ Xscn::Xscn(string cardName, string material, TFile* outFile) { // Constructor
 			//strXscnVsEnergyAndAngle.reserve(nFinalStates);
 		}
 		if(name=="PDGT") pdgTarget = stoi(value); 	
-		if(name=="PDGF") pdgFinal0 = stoi(value); 	
+		if(name=="PDGF") {
+			pdgFinal0 = stoi(value);
+			if(value.length() == 10) { // not nucleus size
+				zFinalNuc = stoi(value.substr(3,3)); // get Z from pdg id
+				aFinalNuc = stoi(value.substr(6,3)); // get A from pdg id
+				cout << "Z nuc: " << zFinalNuc << " - A nuc: " << aFinalNuc << endl;
+			}
+			else {
+				zFinalNuc = 0; aFinalNuc = 0;
+			}
+		} 	
 		if(name=="PDGL") pdgLepton = stoi(value); 	
 		if(name=="MT") mTarget = stod(value); 	
 		if(name=="MF") mFinal0 = stod(value); 	
@@ -76,16 +86,27 @@ Xscn::Xscn(string cardName, string material, TFile* outFile) { // Constructor
 	xscnVsEnergyAngle = readXscnDouble();
 	if(nFinalStates>1 && excData!=0) {
 		cout << "Reading Excited Levels" << endl;
-		excLevels = readExcStates();
+		readExcStates();
 		cout << "Reading Probabilities of Each Excited State As a Function of Energy" << endl;
 		excProbVsEnergy = readExcProb();
+		if(decayFinal0 == true) { // If decay is simulated, then run TALYS to get decay probs.
+			for (int exCtr = 1; exCtr < excLevels.size(); exCtr++) {
+				cout << "Here" << endl;
+				excLevels[exCtr].runTalys(); // run TALYS
+				excLevels[exCtr].initHists(); // init histograms based on TALYS output size
+				//excLevels[exCtr].fillHists();	// fill histograms from TALYS output to sample later
+			}
+		}
 	}
 	if(nFinalStates==1) { // Fill the ground state with the given mass in xscn card
-		exStates excLevel0;
+		cout << "Here " << endl;
+		Exstates excLevel0;
 		excLevel0.energyInitial = mFinal0-mTarget;
 		excLevel0.energyGnd = 0;
+		excLevel0.xscn = this;
 		excLevels.push_back(excLevel0);
 	}
+
 	xscnRand.SetSeed(0);
 	// Lepton Energy and Direction Distribution Filled
 	leptonDirEnergyDist = new TH3D((TString)strName+"_leptonDir","Lepton Dir & Energy",
@@ -121,7 +142,7 @@ vector<TH2D*> Xscn::readXscnDouble() { // Read Double Diff Xscn Per Exc Energy
 			double tEne;
 			inFile >> tEne;
 			if(inFile.eof()) break;
-			for (int ang = 0; ang < 20; ang++) { // loop over angles
+			for (int ang = 0; ang < angBins; ang++) { // loop over angles
 				double tDdXscn;
 				inFile >> tDdXscn;
 				ddXscnH->SetBinContent(tEne,ang+1,tDdXscn);
@@ -154,8 +175,7 @@ TH2D* Xscn::readExcProb() { // Read Exc Prob vs Energy, Call only if nFinalState
 	return excProbH;
 }
 
-vector<exStates> Xscn::readExcStates() { // Read Exc State Info
-	vector<exStates> excLevels;
+void Xscn::readExcStates() { // Read Exc State Info
 	ifstream inFile(strExcStates);
 	string line;
 	for (int i = 0; i < 6; i++) getline(inFile,line); // Skip 6 Lines
@@ -165,17 +185,19 @@ vector<exStates> Xscn::readExcStates() { // Read Exc State Info
 		int tSpin, tParity;
 		inFile >> tEx >> tSpin >> tParity >> dummy[0] >> dummy[1] >> dummy[2];
 		if(inFile.eof()) break;
-		// Fill Struct
-		exStates tempState;
+		// Fill excited state object array
+		Exstates tempState;
 		excLevels.push_back(tempState);
 		excLevels[exCtr].energyInitial = tEx;
 		excLevels[exCtr].energyGnd = tEx - excLevels[0].energyInitial;
 		excLevels[exCtr].spin = tSpin;
 		excLevels[exCtr].parity = (tSpin==1) ? -1:1;
+		excLevels[exCtr].xscn = this;
+		excLevels[exCtr].nState = exCtr;
 		exCtr++;
 	} // Finish Reading File
 	inFile.close();
-	return excLevels;
+	return;
 }
 
 // Functions To Get Xscn At Asked Values
@@ -236,3 +258,5 @@ int Xscn::generateEventCountPerEnergy(Flux inFlux, Detector inDet) {
 	}
 	return eventsVsEnergy->Integral();
 }
+
+

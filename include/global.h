@@ -20,5 +20,6 @@ class Event;
 class Xscn;
 class Flux;
 class Detector;
+class exStates;
 
 #endif

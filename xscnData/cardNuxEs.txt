@@ -1,0 +1,51 @@
+# Card File For NuX-Electron Elastic Scattering, Information Describing the Interaction is Here
+# Tells Where to find Xscn Files, Number of Excited States
+# Which Types of Neutrinos Interact This Way...
+# --- Means Not Existing
+# Name
+XSCN_NAME NUXES
+# How many targets in a molecule in different materials (10 e- per water molecule)
+WATERPERMOLECULE 10
+HEAVYWATERPERMOLECULE 10
+# Possible Number of Final States
+FINALSTATES 1
+# Target PDG No
+PDGT 11
+# Final Hadron PDG No (0 if notexistent)
+PDGF 0
+# Final Charged Lepton PDG No (0 if not existent)
+PDGL 11
+# Target PDG No
+MT 0.511
+# Final Hadron Mass (0 if not existent)
+MF 0
+# Final Charged Lepton Mass (0 if not existent or neutrino)
+ML 0.511
+# Whether write the particle MF in output (no need to write undetectable particles)
+WRITE_F 0
+# Whether follow the decay chain of excited states (for MF)
+DECAY_F 0
+# Which neutrinos do this interaction
+NUE 0
+NUEBAR 0
+NUMU 1
+NUMUBAR 0
+NUTAU 1
+NUTAUBAR 0
+# Is Double Differential Info Supplied
+DOUBLEDIFF 1
+# Angular Bins [cos(thethaNue)] Supplied
+ANGBINS 1000
+# Energy Bins Supplied (How many rows of info)
+ENERGYBINS 200
+# Is Excitation Energies Supplied
+EXCDATA 0
+# Xscn vs Energy
+XSCNDATA xscnData/nuxEsXscn.txt
+# Excited State Info File (Excitation Energy, Nuclear Spin, Parity)
+EXCLEVELDATA ---
+# Probability of Excitation
+EXCPROBDATA ---
+# Angular Xscn Data per Final State (so 01 is final state with lowest energy...)
+# Expected to have a file for each excited state and in order!!!
+01_ANGXSCNDATA xscnData/nuxEsXscnDoubleDiff.txt

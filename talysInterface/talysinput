@@ -1,0 +1,38 @@
+# General (will be modified by Newton)
+projectile 0
+element 7 
+mass 16
+energy talysInterface/exFile0 
+
+# Will stay the same
+popmev n
+channels y
+maxlevelsres 40
+maxlevelsbin g 20
+maxlevelsbin p 20
+maxlevelsbin n 20
+maxlevelsbin d 20
+maxlevelsbin t 20
+maxlevelsbin h 20
+maxlevelsbin a 20
+levelfile 9 talysInterface/data/F.lev.mod
+levelfile 7 talysInterface/data/N.lev.mod
+disctable 1
+popeps 1e-10
+xseps 1e-10
+
+#production y
+# Output
+outmain y
+outspectra n
+outlevels y
+outpopulation y
+outexcitation n
+outbinspectra n
+outgamdis y
+outdiscrete n
+adddiscrete n
+#outdensity y
+
+#outgamma y
+#filediscrete 1        

@@ -28,8 +28,11 @@
 
 // Struct For Excited Levels
 struct Particle{
-	double energy; // Energy From The Initial State
-	double mass; // Energy From The Ground State of the Final Product
+	double energy; // Energy
+	double momentum; // Momentum
+	int simDegree; // 1 if created at vertex, 2 if created through de-excitation/nucleon emission
+	double mass; // Mass of the particle
+	double time; // Time particle is created relative to the 1st interaction
 	int pdgId; // Pdg ID
 	TVector3 direction; // Parity of Excited State
 	bool isSimulated;
@@ -42,12 +45,19 @@ public:
 	Event(double inEnergy, Xscn &inXscn, Flux &inFlux, Detector &inDet);
 
 	// Functions To Write Event to Kin File
-	// void writeEvent(ofstream &outKinFile);
+	void writeEvent(std::ofstream &outFile);
+	
 	// Lepton is the 0th indice, hadron is the 1st indice, de-excitation stuff is 2nd, 3rd...
-	void fillLeptonDirAndEnergy(); // call this first
-	//void fillHadronDirAndEnergy();
+	void fillLeptonDirAndEnergy(); // fill lepton info
+	void fillHadronDirAndEnergy(); // fill hadron info if simulated
+	// add particles with given properties for de-excitation
+	void addParticle(int pdgId, double energy, TVector3 direction, double time=0);
+	void addParticle(int pdgId, double energy, double time=0); // direction will be random
+	
 	// A handy kinematic function
 	TVector3 combineZenAzi(double cosZen1,double azi1, double cosZen2, double azi2);
+	// Gives a random TVector3
+	TVector3 isotropicDirection();
 
 	// Info related to Event
 	std::string xscnName; // Xscn Name
@@ -55,7 +65,6 @@ public:
 	double nuEnergy;
 	unsigned int nuFlv;
 	TVector3 vertex;
-	double time;
 
 	// Info Needed To Calculate Direction and Energy of Output Lepton 
 	double fluxCosZen, fluxAzi; // zenith and azimuth from flux

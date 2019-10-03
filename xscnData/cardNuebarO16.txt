@@ -10,9 +10,9 @@ HEAVYWATERPERMOLECULE 1
 # Possible Number of Final States
 FINALSTATES 42
 # Target PDG No
-PDGT 111111
+PDGT 1000080160
 # Final Hadron PDG No (0 if notexistent)
-PDGF 111110
+PDGF 1000070160
 # Final Charged Lepton PDG No (0 if not existent)
 PDGL -11
 # Target PDG Mass

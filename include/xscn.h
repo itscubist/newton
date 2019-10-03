@@ -25,16 +25,7 @@
 #include "event.h"
 #include "flux.h"
 #include "detector.h"
-
-
-// Struct For Excited Levels
-struct exStates{
-	double energyInitial; // Energy From The Initial State
-	double energyGnd; // Energy From The Ground State of the Final Product
-	int spin; // Spin of Excited State
-	int parity; // Parity of Excited State
-};
-
+#include "exstates.h"
 
 class Xscn{
 public:
@@ -59,8 +50,10 @@ public:
 	int pdgLepton; // pdg of procuded lepton
 	double mTarget; // mass of target
 	double mFinal0; // ground state mass of produced final nucleus, hadron...
+	int zFinalNuc; // if there is a final nucleus, Z of the nucleus
+	int aFinalNuc; // same as above, A of the nucleus
 	double mLepton; // mass of produced lepton
-
+	
 	bool writeFinal0; // Whether final hadron should be written to kin file 
 	bool decayFinal0; // Whether final hadron's decay from excited state should be simulated
 	bool intNu[6]; // Neutrinos participate in the interaction
@@ -73,7 +66,7 @@ public:
 	// Where Info is Stored
 	TH1D* xscnVsEnergy;
 	std::vector<TH2D*> xscnVsEnergyAngle;
-	std::vector<exStates> excLevels;
+	std::vector<Exstates> excLevels;
 	TH2D* excProbVsEnergy;
 	
 	// Generated Events
@@ -89,7 +82,7 @@ private:
 	TH1D* readXscn(); // Read Single Diff Xscn
 	std::vector<TH2D*> readXscnDouble(); // Read Double Diff Xscn Per Exc Energy
 	TH2D* readExcProb(); // Read Exc Prob vs Energy
-	std::vector<exStates> readExcStates(); // Read Exc State Info
+	void readExcStates(); // Read Exc State Info
 	
 	// Filenames to Read Info From	
 	std::string strXscnVsEnergy;

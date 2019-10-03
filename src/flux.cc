@@ -105,7 +105,7 @@ double Flux::fluxAtEnergy(double energy, unsigned int flavor) { //total flux at 
 
 // total flux at a given energy, zenith and azimuth for a flavor
 double Flux::fluxAtDirection(double energy, double cosAngle, double azimuth, unsigned int flavor) { 
-	//energy/=energyScale;
+	//energy/=energyScale; //?
 	return fluxVsEnergyDirectional[flavor]->Interpolate(cosAngle,azimuth,energy);
 }
 

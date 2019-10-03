@@ -15,7 +15,7 @@ DENSITY 1.0
 # Mass of the detector in Tons (NOT KiloTons, NOT Kilograms) (fiducial mass in this case)
 DETMASS 22500.0
 # Simulation Time (in Years)
-DETYEARS 20.0
+DETYEARS 500.0
 # Years to Seconds Ratio (divided by 10^7)
 SECONDSINYEAR 3.1557600
 # For precision reasons, Xscn is multiplied by 10^38, nAvo by 10^-23, years/seconds by 10^-7  
