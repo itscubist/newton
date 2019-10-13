@@ -61,16 +61,19 @@ public:
 	bool excData; // Whether Excited state data exists
 	
 	unsigned int angBins; // Number of Angular Bins
-	unsigned int energyBins; // Number of Energy Bins
+	unsigned int energyBins; // Number of Energy Bins Used in Single Diff
+	unsigned int energyBins2; // Number of Energy Bins Used in Excitation and Angular Prob
 
 	// Where Info is Stored
 	TH1D* xscnVsEnergy;
 	std::vector<TH2D*> xscnVsEnergyAngle;
 	std::vector<Exstates> excLevels;
+	TalysData talysDecayer;
 	TH2D* excProbVsEnergy;
 	
 	// Generated Events
 	TH1D* eventsVsEnergy;
+	TH1D* expectedVsEnergy;
 	std::vector<double> genEnergies;
 	TH3D* leptonDirEnergyDist;
 

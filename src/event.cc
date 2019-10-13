@@ -62,6 +62,11 @@ Event::Event(double inEnergy, Xscn &inXscn, Flux &inFlux, Detector &inDet) {
 	fillLeptonDirAndEnergy();
 	// Fill hadron energy and direction if the xscn card asks for hadron output
 	fillHadronDirAndEnergy();
+	
+	//Initialize event totals
+	totalNeutrons = 0;
+	totalGammaEnergy = 0;
+
 }
 
 // Functions To Write Event to Kin File
@@ -96,6 +101,8 @@ void Event::fillLeptonDirAndEnergy() {
 }
 
 void Event::fillHadronDirAndEnergy() {
+	// If final hadron is a neutron increase neutron number
+	if(finalHadron.pdgId == 2112) totalNeutrons++;
 	// If no hadron, or not simulated
 	if(particles[1].mass==0 || particles[1].isSimulated==false) return; 	
 	double pHz = nuEnergy - xscnCosAngle*particles[0].momentum;	
@@ -113,7 +120,8 @@ void Event::fillHadronDirAndEnergy() {
 }
 
 // Add gamma to a specific direction, at a specific time if so desired
-void Event::addParticle(int pdgId, double energy, TVector3 direction, double time) {
+// if isKE = 1 then energy input is considered kinetic energy
+void Event::addParticle(int pdgId, double energy, TVector3 direction, double time, bool isKE) {
 	Particle decayP;
 	decayP.pdgId = pdgId;
 	// Get masses from pdg id in MeV
@@ -126,19 +134,24 @@ void Event::addParticle(int pdgId, double energy, TVector3 direction, double tim
 	if(pdgId==1000020030) decayP.mass = 2809.413; // He-3
 	if(pdgId==1000020040) decayP.mass = 3728.401; // alpha
 	decayP.energy = energy;
+	if(isKE) decayP.energy += decayP.mass; // if input is kinetic energy
 	decayP.momentum = sqrt(pow(decayP.energy,2)-pow(decayP.mass,2));
 	decayP.time = time;
 	decayP.isSimulated = true;
 	decayP.direction = direction; 
 	decayP.simDegree = 2; 
+	// To store total gamma energy and total neutron number, observables
+	if(pdgId==2112) totalNeutrons++; // increase total neutron number
+	if(pdgId==22) totalGammaEnergy+=decayP.energy; // neutron
+
 	particles.push_back(decayP);
 	return;
 }
 
 // Adds gamma with given energy isotropically
-void Event::addParticle(int pdgId, double energy, double time) {
+void Event::addParticle(int pdgId, double energy, double time, bool isKE) {
 	TVector3 dir = isotropicDirection();
-	addParticle(pdgId,energy,dir,time); // call the function with direction setting
+	addParticle(pdgId,energy,dir,time,isKE); // call the function with direction setting
 	return;
 }
 
@@ -147,7 +160,7 @@ void Event::writeEvent(ofstream &outFile) {
 	double curTime = particles[0].time;
 	outFile << "$ begin" << endl;
 	// Initial vertex
-	outFile << "$ vertex " << vertex.X() <<" "<< vertex.Y() <<" "<< vertex.Z() <<" "<< curTime << endl;	
+	outFile<<"$ vertex "<< vertex.X() <<" "<< vertex.Y() <<" "<< vertex.Z() <<" "<< curTime << endl;	
 	for (int pCtr = 0; pCtr < particles.size(); pCtr++) { // loop over particles
 		if(particles[pCtr].isSimulated==false) continue; // if particle is not simulated skip
 		if(particles[pCtr].time!=curTime) { // Then need to add another vertex with new time

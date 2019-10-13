@@ -1,20 +1,22 @@
 # General (will be modified by Newton)
 projectile 0
-element 7 
+element 9 
 mass 16
 energy talysInterface/exFile0 
 
 # Will stay the same
 popmev n
 channels y
-maxlevelsres 40
-maxlevelsbin g 20
-maxlevelsbin p 20
-maxlevelsbin n 20
-maxlevelsbin d 20
-maxlevelsbin t 20
-maxlevelsbin h 20
-maxlevelsbin a 20
+bins 100
+#maxlevelsres 40
+#maxlevelsbin g 20
+#maxlevelsbin p 20
+#maxlevelsbin n 20
+#maxlevelsbin d 20
+#maxlevelsbin t 20
+#maxlevelsbin h 20
+#maxlevelsbin a 20
+
 levelfile 9 talysInterface/data/F.lev.mod
 levelfile 7 talysInterface/data/N.lev.mod
 disctable 1
@@ -25,13 +27,13 @@ xseps 1e-10
 # Output
 outmain y
 outspectra n
-outlevels y
-outpopulation y
+outlevels n
+outpopulation n
 outexcitation n
 outbinspectra n
-outgamdis y
+outgamdis n
 outdiscrete n
-adddiscrete n
+adddiscrete y
 #outdensity y
 
 #outgamma y

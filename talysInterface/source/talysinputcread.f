@@ -1,5 +1,5 @@
       subroutine talysinputcread(inputfilename,projectile,tarZ,
-     + tarA, exSpin, exParity, exEne)
+     + tarA)
 c
 c +---------------------------------------------------------------------
 c | Author: Arjan Koning
@@ -21,11 +21,10 @@ c checkvalue  : subroutine to check for errors in values
 c
       character*64 inputfilename
       character*1 projectile
-      integer tarZ, tarA, exSpin, exParity
-      real exEne
+      integer tarZ, tarA
 
       call readinputcfile(inputfilename)
-      call input1cread(projectile, tarZ, tarA, exEne, exSpin, exParity)
+      call input1cread(projectile, tarZ, tarA)
       call input2
       call input3
       call input4

@@ -51,8 +51,8 @@ public:
 	void fillLeptonDirAndEnergy(); // fill lepton info
 	void fillHadronDirAndEnergy(); // fill hadron info if simulated
 	// add particles with given properties for de-excitation
-	void addParticle(int pdgId, double energy, TVector3 direction, double time=0);
-	void addParticle(int pdgId, double energy, double time=0); // direction will be random
+	void addParticle(int pdgId, double energy, TVector3 direction, double time=0, bool isKE=0);
+	void addParticle(int pdgId, double energy, double time=0, bool isKE=0);// direction will be random
 	
 	// A handy kinematic function
 	TVector3 combineZenAzi(double cosZen1,double azi1, double cosZen2, double azi2);
@@ -73,7 +73,13 @@ public:
 	double finalHadMass; // Mass of the outgoing final (with excitation energy)
 	double xscnCosAngle; // cos(ThetaNuE) from xscn
 	double xscnAzi; // uniform azi
+	
+	// Info about decays
+	double totalGammaEnergy; // total energy of deexcitation gammas
+	int totalNeutrons; // total energy of deexcitation gammas
 
+	// To check energy/momentum conservation
+	double consEnMom[4];
 	
 	// Output Particles Related To This Event
 	std::vector<Particle> particles;

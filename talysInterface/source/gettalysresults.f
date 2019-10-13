@@ -34,6 +34,14 @@ c Will need these for getting array sizes in c++
 
 c Probability of decay
       excprobs = feedexcl(jz,jn,jpar,jexc,jexcout)
+
+c To Print if Required for Debugging:
+
+c      if(.not.excprobs.eq.0) then
+c        print *,"Z: ", jz, " N: ", jn, " Exc: ", jexc, " via: ",jpar, 
+c     + " to: ", jexcout, " probabilitiy: ", excprobs
+c      endif
+
 c Initial Energy and Bin Width
       excenes1 = Ex(jz,jn,jexc) 
       if(jexc.le.nnexc) then 
@@ -44,9 +52,9 @@ c Initial Energy and Bin Width
 c Final Energy and Bin Width
       excenes2 = Ex(jz,jn,jexcout) 
       if(jexcout.le.nnexcout) then 
-        excbinw1 = deltaEx(jz,jn,jexcout)
+        excbinw2 = deltaEx(jz,jn,jexcout)
       else 
-        excbinw1 = 0
+        excbinw2 = 0
       endif
       sepenes = S(jz,jn,jpar)
 

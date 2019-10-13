@@ -67,9 +67,23 @@ int main(int argc, const char *argv[]) {
 	for (int xCtr = 0; xCtr < nXscn; xCtr ++) {
 		xscnCounts[xCtr] = 	activeXscns[xCtr]->generateEventCountPerEnergy(atmFlux, superK);
 		cout << "Total " << xscnNames[xCtr] << " Events: " << xscnCounts[xCtr] << endl;
-		activeXscns[xCtr]->xscnVsEnergy->Write();	
-		activeXscns[xCtr]->xscnVsEnergyAngle[0]->Write();
+		cout << "Expected " << xscnNames[xCtr] << " Events: " << activeXscns[xCtr]->
+				expectedVsEnergy->Integral() << endl;
+		
+		activeXscns[xCtr]->xscnVsEnergy->SetLineWidth(2);
+		activeXscns[xCtr]->xscnVsEnergy->GetXaxis()->SetTitle("Neutrino Energy (MeV)");
+		activeXscns[xCtr]->xscnVsEnergy->GetYaxis()
+			->SetTitle("Cross Section (#10^{-38} #cm^{2})");
+		activeXscns[xCtr]->xscnVsEnergy->Write();
+		unsigned int exCtr = 0;
+		if(xCtr == 1 || xCtr == 2) exCtr=41;
+		activeXscns[xCtr]->xscnVsEnergyAngle[exCtr]->Write();
 		activeXscns[xCtr]->eventsVsEnergy->Write();
+		activeXscns[xCtr]->expectedVsEnergy->SetLineWidth(2);
+		activeXscns[xCtr]->expectedVsEnergy->GetXaxis()->SetTitle("Neutrino Energy (MeV)");
+		activeXscns[xCtr]->expectedVsEnergy->GetYaxis()
+			->SetTitle("Exp. Count/22.5kTon/20years/MeV");
+		activeXscns[xCtr]->expectedVsEnergy->Write();
 	}
 	// Some Testing
 	for (int i = 0; i < 6; i++) atmFlux.fluxVsEnergy[i]->Write();
@@ -84,14 +98,15 @@ int main(int argc, const char *argv[]) {
 	vector<Event> genEvents;
 	TString aziName = "hAzi_";
 	TString zenName = "hZen_";
-	TString ezName = "hEZ_ ";
-	TH1D* hAzi[nXscn], *hZen[nXscn];
+	TString eName = "hE_ ";
+	TH1D* hAzi[nXscn], *hZen[nXscn], *hE[nXscn];
 	for (unsigned int xCtr = 0; xCtr < nXscn; xCtr++) {
 		cout << "Xscn: " << xscnNames[xCtr] << endl; // Print Xscn
 		for (unsigned int eCtr = 0; eCtr < activeXscns[xCtr]->genEnergies.size(); eCtr++) {
+			//cout << "Event Index: " << eCtr << endl;
 			Event tempEvent(activeXscns[xCtr]->genEnergies[eCtr],*activeXscns[xCtr],atmFlux,superK);
-			if(tempEvent.xscnExState>0) { // Add gamma
-				tempEvent.addParticle(22,activeXscns[xCtr]->excLevels[tempEvent.xscnExState].energyGnd,0);	
+			if(tempEvent.xscnExState>0) { // Let decay
+				activeXscns[xCtr]->talysDecayer.decayParticles(tempEvent);
 			}
 			genEvents.push_back(tempEvent);
 			double tempCosZen = tempEvent.particles[0].direction.CosTheta();
@@ -101,13 +116,28 @@ int main(int argc, const char *argv[]) {
 			// Fill TH3D of electron
 			activeXscns[xCtr]->leptonDirEnergyDist->Fill(tempCosZen,tempAzi,tempEne);
 		}
+		outFile->cd();
 		activeXscns[xCtr]->leptonDirEnergyDist->Write();
 		hZen[xCtr] = activeXscns[xCtr]->leptonDirEnergyDist->
 				ProjectionX(zenName + xscnNames[xCtr],1,12,30,100,"e");
+		hZen[xCtr]->GetXaxis()->SetTitle("Lepton Energy (MeV)");
+		hZen[xCtr]->GetYaxis()->SetTitle("Events/22.5kTon/20years/cosBin");
+		hZen[xCtr]->SetLineWidth(2);
 		hZen[xCtr]->Write();		
 		hAzi[xCtr] = activeXscns[xCtr]->leptonDirEnergyDist->
-				ProjectionY(aziName+xscnNames[xCtr],10,11,30,100,"e");
+				ProjectionY(aziName+xscnNames[xCtr],5,15,30,100,"e");
+		hAzi[xCtr]->GetXaxis()->SetTitle("Lepton Energy (MeV)");
+		hAzi[xCtr]->GetYaxis()->SetTitle("Events/22.5kTon/20years/30 Degrees");
+		hAzi[xCtr]->SetLineWidth(2);
 		hAzi[xCtr]->Write();
+		hE[xCtr] = activeXscns[xCtr]->leptonDirEnergyDist->
+				ProjectionZ(eName+xscnNames[xCtr],0,20,0,12,"e");
+		hE[xCtr]->GetXaxis()->SetTitle("Lepton Energy (MeV)");
+		hE[xCtr]->GetYaxis()->SetTitle("Events/22.5kTon/20years/MeV");
+		hE[xCtr]->SetLineWidth(2);
+		cout << "30-100 MeV Lepton Count in: " << xscnNames[xCtr] << " is: " << 
+			hE[xCtr]->Integral(30,100) << endl; 
+		hE[xCtr]->Write();
 
 	}
 	// out Kinematic File

@@ -1,4 +1,4 @@
-      subroutine input1cread(projectile,tarZ,tarA,exEne,exSpin,exParity)
+      subroutine input1cread(projectile,tarZ,tarA)
 c
 c +---------------------------------------------------------------------
 c | Author: Arjan Koning
@@ -10,8 +10,7 @@ c ****************** Declarations and common blocks ********************
 c
       include "talys.cmb"
       character*1 projectile
-      integer tarZ, tarA, exSpin, exParity, exBin
-      real exEne
+      integer tarZ, tarA
 
       logical      projexist,massexist,elemexist,enerexist,lexist,fexist
       character*1  ch
@@ -575,14 +574,14 @@ c
 c
 c Only excitation energy distribution (no spins)
 c
-        exBin = INT(exEne * 10.0 + 0.5) + 1
-        print *,exBin, exSpin, exParity
+c        exBin = INT(exEne * 10.0 + 0.5) + 1
+c       print *,exBin, exSpin, exParity
         
         if (npopJ.eq.0) then
           do 350 nen=1,npopE
             read(2,*,end=510,err=510) EdistE(nen),PdistE(nen)
   350     continue
-          PdistE(exBin) = 1.0
+c          PdistE(exBin) = 1.0
         else
 c
 c Spin-dependent excitation energy distribution (no total)
@@ -621,7 +620,7 @@ c
         enincmax=eninc(1)
 
 c Add the Bin that is non-zero manually based on exEne given from c++
-        PdistJP(exBin,exSpin,exParity) = 1.0
+c        PdistJP(exBin,exSpin,exParity) = 1.0
       endif
 c
 c In case of built-in energy range, write an explicit 'energies' file

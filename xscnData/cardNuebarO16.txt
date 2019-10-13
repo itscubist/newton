@@ -36,12 +36,14 @@ NUTAUBAR 0
 DOUBLEDIFF 1
 # Angular Bins [cos(thethaNue)] Supplied
 ANGBINS 20
-# Energy Bins Supplied (How many rows of info)
-ENERGYBINS 115
+# Energy Bins Supplied For Single Diff Xscn(How many rows of info)
+ENERGYBINS 200
+# Energy Bins Supplied for Double Diff and  (If not entered assumed same as above)
+ENERGYBINS2 115
 # Is Excitation Energies Supplied
 EXCDATA 1
 # Xscn vs Energy
-XSCNDATA xscnData/nuebarO16xscn.txt
+XSCNDATA xscnData/nuebarO16xscn200.txt
 # Excited State Info File (Excitation Energy, Nuclear Spin, Parity)
 EXCLEVELDATA xscnData/nuebarOxygenExcitedStates.txt
 # Probability of Excitation

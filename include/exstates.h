@@ -28,11 +28,15 @@
 #include "detector.h"
 
 const unsigned int ZMAX = 10;
-const unsigned int NMAX = 10;
+const unsigned int NMAX = 16;
 const unsigned int PMAX = 7;
 const unsigned int EXINMAX = 150;
 const unsigned int EXOUTMAX = 150;
 
+//
+struct TalysBrancher;
+class TalysData;
+struct Exstates;
 
 // order: gamma, neutron,  proton, deuteron, triton, he-3, alpha
 enum particle {g,n,p,d,t,h,a};
@@ -44,44 +48,63 @@ const int NRED[7] = {0,1,0,1,2,1,2};
 extern "C" {
 	void machine_();
 	void constants_();
-	void talysinputcread_(char*,char*,int*,int*,int*,int*,float*);
+	void talysinputcread_(char*,char*,int*,int*);
+	void inputsetexenes_(float*,int*,int*,float*);	
+	//void inputsetexenes_(exEne,exSpin,exParity, popValue)
 	void talysinitial_(); 
 	void talysreaction_(); 
 	void gettalysresults_(int*,int*,int*,int*,int*,int*,int*,int*,int*,int*,
 			float*,float*,float*,float*,float*,float*); 
 }
 
-// Class For Excited Levels
-class Exstates{
+
+// Class to handle talys interface
+class TalysData {
 public:
 	// Constructor, Destructor
-	Exstates(double inEnergyGnd=0.0);
-	~Exstates();
-
+	TalysData(Xscn* inXscn=NULL);
+	~TalysData();
+	
 	// Functions
-	void initHists(); // initialize huge arrays of histograms
 	void runTalys(); // runs TALYS for this exited state
-	void fillHists(); // fills histograms by questioning TALYS 
+	void initHists(); // initialize huge arrays of histograms
+	void textOutput(); // initialize huge arrays of histograms
+	void setFileName(TString inString); // sets name of decay histogram save file
 	TString getHName(int z, int n, int exc); // get a string for given values
 
+	// Get a decay particle from decay histograms 
+	unsigned int decayParticles(Event& event);
+	
+	Xscn* xscn;
+	
+	
+	// First attempt that eats memory, but might still be useful
+	TString talysFileName;
+	
+	std::vector<std::vector<std::vector<TH2D*> > > decayHists;
+	std::vector<std::vector<std::vector<double> > > sepEnergies;
+	std::vector<std::vector<std::vector<double> > > excEnergies;
+	std::vector<std::vector<std::vector<double> > > binW;
+
+private:
+	TRandom3 decayRand;
+	// Actual Upper Limits Based on TALYS output
+	int nZ, nN, nPar, nExc, nExcout;
+
+};
+
+// Struct For Excited Levels
+struct Exstates{
 	// Variables
 	double energyInitial; // Energy From The Initial State
 	double energyGnd; // Energy From The Ground State of the Final Product
 	int spin; // Spin of Excited State
 	int parity; // Parity of Excited State
 	int nState; // The excited state no
-	Xscn* xscn;
-	TString fileName;
-	TFile* talysFile;
 
-	// Actual Upper Limits Based on TALYS output
-	int nZ, nN, nPar, nExc, nExcout;
- 		
-	TH2D* decayHists[ZMAX][NMAX][EXINMAX];
-	double sepEnergies[ZMAX][NMAX][PMAX];
-	double excEnergies[ZMAX][NMAX][EXINMAX];
-	double binW[ZMAX][NMAX][EXINMAX];
-	
+ 	// Directed graphs style decay branching
+	//std::vector<TalysBrancher*> startingBr;
+	//TH1D startingProbs; //probability of its branches	
 };
 
 #endif

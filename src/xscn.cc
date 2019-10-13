@@ -64,7 +64,11 @@ Xscn::Xscn(string cardName, string material, TFile* outFile) { // Constructor
 		if(name=="NUTAU") intNu[4] = stoi(value); 	
 		if(name=="NUTAUBAR") intNu[5] = stoi(value); 	
 		if(name=="ANGBINS") angBins = stoi(value); 		
-		if(name=="ENERGYBINS") energyBins = stoi(value); 		
+		if(name=="ENERGYBINS") {
+			energyBins = stoi(value); 		
+			energyBins2 = energyBins; // assume energyBins2 = energyBins if not overwritten later
+		}
+		if(name=="ENERGYBINS2") energyBins2 = stoi(value);
 		if(name=="DOUBLEDIFF") doubleDiff = stoi(value); 		
 		if(name=="EXCDATA") excData = stoi(value); 		
 		if(name=="XSCNDATA") strXscnVsEnergy = value; 		
@@ -84,26 +88,24 @@ Xscn::Xscn(string cardName, string material, TFile* outFile) { // Constructor
 	xscnVsEnergy = readXscn();
 	cout << "Reading Double Differential Xscn For Each Excited State" << endl;
 	xscnVsEnergyAngle = readXscnDouble();
+	
+	talysDecayer.xscn = this;
 	if(nFinalStates>1 && excData!=0) {
 		cout << "Reading Excited Levels" << endl;
 		readExcStates();
 		cout << "Reading Probabilities of Each Excited State As a Function of Energy" << endl;
 		excProbVsEnergy = readExcProb();
-		if(decayFinal0 == true) { // If decay is simulated, then run TALYS to get decay probs.
-			for (int exCtr = 1; exCtr < excLevels.size(); exCtr++) {
-				cout << "Here" << endl;
-				excLevels[exCtr].runTalys(); // run TALYS
-				excLevels[exCtr].initHists(); // init histograms based on TALYS output size
-				//excLevels[exCtr].fillHists();	// fill histograms from TALYS output to sample later
-			}
+	  if(decayFinal0 == true) { // If decay is simulated, then run TALYS to get decay probs.
+			talysDecayer.runTalys(); // run TALYS
+			//talysDecayer.textOutput(); // for testing access
+			talysDecayer.setFileName("talysInterface/talysOutputs/"+(TString)strName+"_decay.root");
+			talysDecayer.initHists(); // init histograms based on TALYS output size
 		}
 	}
 	if(nFinalStates==1) { // Fill the ground state with the given mass in xscn card
-		cout << "Here " << endl;
 		Exstates excLevel0;
 		excLevel0.energyInitial = mFinal0-mTarget;
 		excLevel0.energyGnd = 0;
-		excLevel0.xscn = this;
 		excLevels.push_back(excLevel0);
 	}
 
@@ -137,7 +139,7 @@ vector<TH2D*> Xscn::readXscnDouble() { // Read Double Diff Xscn Per Exc Energy
 		inFile.open(strXscnVsEnergyAndAngle[ex]);
 		getline(inFile,line);
 		TH2D* ddXscnH = new TH2D(Form(((TString)strName)+"_angXscFsH_%d",ex), // Declare Hist
-				(TString)strXscnVsEnergyAndAngle[ex],energyBins,0.5,(double)(energyBins)+0.5,angBins,-1,1);	
+			(TString)strXscnVsEnergyAndAngle[ex],energyBins2,0.5,(double)(energyBins2)+0.5,angBins,-1,1);	
 		while(!inFile.eof()){ // Loop to read file
 			double tEne;
 			inFile >> tEne;
@@ -160,7 +162,7 @@ TH2D* Xscn::readExcProb() { // Read Exc Prob vs Energy, Call only if nFinalState
 	string line;
 	getline(inFile,line);
 	TH2D* excProbH = new TH2D((TString)(strName)+"_excProbH",(TString)strExcProb, // Declare Hist
-			energyBins,0.5,(double)(energyBins)+0.5,nFinalStates,-0.5,(double)(nFinalStates)-0.5); 
+			energyBins2,0.5,(double)(energyBins2)+0.5,nFinalStates,-0.5,(double)(nFinalStates)-0.5); 
 	while(!inFile.eof()){
 		double tEne;
 		inFile >> tEne;
@@ -192,8 +194,6 @@ void Xscn::readExcStates() { // Read Exc State Info
 		excLevels[exCtr].energyGnd = tEx - excLevels[0].energyInitial;
 		excLevels[exCtr].spin = tSpin;
 		excLevels[exCtr].parity = (tSpin==1) ? -1:1;
-		excLevels[exCtr].xscn = this;
-		excLevels[exCtr].nState = exCtr;
 		exCtr++;
 	} // Finish Reading File
 	inFile.close();
@@ -213,6 +213,10 @@ double Xscn::xscnAtEnergyAngle(double energy, double cosAngle, unsigned int exLe
 unsigned int Xscn::randomExLevelAtEnergy(double energy) { // Random Excited State At Sel. Energy 
 	if(nFinalStates<2) return 0; // only excited state is the zeroth
 	unsigned int selBin = excProbVsEnergy->GetXaxis()->FindBin(energy);
+	// Not great but if energy is too high, so that no excitation data is available,
+	// use the highest energy data avilable
+	if(selBin>excProbVsEnergy->GetXaxis()->GetNbins()) 
+		selBin = excProbVsEnergy->GetXaxis()->GetNbins();
 	TH1D* excProbAtEnergy = excProbVsEnergy->ProjectionY("exP",selBin,selBin);
 	unsigned int exLevel = round(excProbAtEnergy->GetRandom());
 	delete excProbAtEnergy;
@@ -221,6 +225,10 @@ unsigned int Xscn::randomExLevelAtEnergy(double energy) { // Random Excited Stat
 
 double Xscn::randomAngleAtEnergy(double energy, unsigned int exLevel) { // Select A Random Angle
 	unsigned int selBin = xscnVsEnergyAngle[exLevel]->GetXaxis()->FindBin(energy);
+	// Not great but if energy is too high, so that no excitation data is available,
+	// use the highest energy data available
+	if(selBin>xscnVsEnergyAngle[exLevel]->GetXaxis()->GetNbins()) 
+		selBin = xscnVsEnergyAngle[exLevel]->GetXaxis()->GetNbins();
 	TH1D* angleProbAtEnergy = xscnVsEnergyAngle[exLevel]->ProjectionY("exP",selBin,selBin);
 	double cosAngle = angleProbAtEnergy->GetRandom();
 	delete angleProbAtEnergy;
@@ -233,7 +241,8 @@ double Xscn::randomAzimuth() { // Select A Random Angle, Uniform Accross Azimuth
 
 // Function To Generate Event Counts with Given Flux
 int Xscn::generateEventCountPerEnergy(Flux inFlux, Detector inDet) {
-	eventsVsEnergy = new TH1D((TString)strName+"_evCnt","Poisson",115,0,115);
+	eventsVsEnergy = new TH1D((TString)strName+"_evCnt","Poisson",132,0,132);
+	expectedVsEnergy = new TH1D((TString)strName+"_expCnt","Poisson",132,0,132);
 	//Loop over bins and fill them with poisson distributed event counts
 	for (unsigned int bCtr = 1; bCtr <= eventsVsEnergy->GetXaxis()->GetNbins(); bCtr++) {
 		double energy = eventsVsEnergy->GetBinCenter(bCtr);				
@@ -248,6 +257,7 @@ int Xscn::generateEventCountPerEnergy(Flux inFlux, Detector inDet) {
 		// Get Event Count, Fill Histogram
 		double evCount = xscnRand.Poisson(poissonPar);
 		eventsVsEnergy->SetBinContent(bCtr,evCount);
+		expectedVsEnergy->SetBinContent(bCtr,poissonPar);
 		// Create Events
 		if(evCount<1) continue;
 		for (int eCtr = 0; eCtr < evCount; eCtr++) {
