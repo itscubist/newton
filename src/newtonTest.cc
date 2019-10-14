@@ -105,7 +105,7 @@ int main(int argc, const char *argv[]) {
 		for (unsigned int eCtr = 0; eCtr < activeXscns[xCtr]->genEnergies.size(); eCtr++) {
 			//cout << "Event Index: " << eCtr << endl;
 			Event tempEvent(activeXscns[xCtr]->genEnergies[eCtr],*activeXscns[xCtr],atmFlux,superK);
-			if(tempEvent.xscnExState>0) { // Let decay
+			if(activeXscns[xCtr]->nFinalStates>1 && activeXscns[xCtr]->decayFinal0==true) { // Let decay
 				activeXscns[xCtr]->talysDecayer.decayParticles(tempEvent);
 			}
 			genEvents.push_back(tempEvent);
@@ -115,7 +115,10 @@ int main(int argc, const char *argv[]) {
 			double tempEne = tempEvent.particles[0].energy;
 			// Fill TH3D of electron
 			activeXscns[xCtr]->leptonDirEnergyDist->Fill(tempCosZen,tempAzi,tempEne);
+			activeXscns[xCtr]->gammaEnergyHist->Fill(tempEvent.totalGammaEnergy);
+			activeXscns[xCtr]->neutronNumberHist->Fill(tempEvent.totalNeutrons);
 		}
+
 		outFile->cd();
 		activeXscns[xCtr]->leptonDirEnergyDist->Write();
 		hZen[xCtr] = activeXscns[xCtr]->leptonDirEnergyDist->
@@ -138,8 +141,12 @@ int main(int argc, const char *argv[]) {
 		cout << "30-100 MeV Lepton Count in: " << xscnNames[xCtr] << " is: " << 
 			hE[xCtr]->Integral(30,100) << endl; 
 		hE[xCtr]->Write();
+		activeXscns[xCtr]->gammaEnergyHist->Write();
+		activeXscns[xCtr]->neutronNumberHist->Write();
 
 	}
+	
+
 	// out Kinematic File
 	ofstream outText("newtonTest.kin");
 	for (int eCtr = 0; eCtr < genEvents.size(); eCtr++) genEvents[eCtr].writeEvent(outText);

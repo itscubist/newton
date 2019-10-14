@@ -76,6 +76,8 @@ public:
 	TH1D* expectedVsEnergy;
 	std::vector<double> genEnergies;
 	TH3D* leptonDirEnergyDist;
+	TH1D* gammaEnergyHist;
+	TH1D* neutronNumberHist;
 
 private:
 	// RNG

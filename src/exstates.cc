@@ -100,6 +100,10 @@ void TalysData::initHists() {
 						decayHists[z][n][e]->SetBinContent(p+1,eo+1, static_cast<double>(decProb));
 					} // end of output excited states
 					sepEnergies[z][n][p]  = static_cast<double>(sepEnergy);
+					/*if(e == 0 ) { // For separation energy test
+						cout << "*** in Init Hists: " << getHName(z,n,e) << endl;
+						cout << "Sep Energy of: " << p << " is: " << sepEnergies[z][n][p] << endl;	
+					}*/
 				} // end of particle type
 				excEnergies[z][n][e] = static_cast<double>(excEnergy1);
 				binW[z][n][e] = static_cast<double>(excBinWidth1);
@@ -124,9 +128,15 @@ void TalysData::initHists() {
 // For now I handle particle emission in the last part of this function manually, basically if
 // separation energy is negative
 //
+// There might still be some problems lurking here:
+// 	- Check separation energies - DONE
+// 	- Checked randomization - Indeed runs look random
+// 	- Need to check: Is there any nue-16O to 16F ground state interaction
+// 	- Checked nuebar-16O to 16N ground state interaction
+//
 //
 unsigned int TalysData::decayParticles(Event& event) {
-	if(xscn->decayFinal0==false || event.xscnExState==0) return 0;
+	if(xscn->decayFinal0==false) return 0;
 	unsigned int pCtr = 0;	
 	int zCur = 0; 
 	int zReal = xscn->zFinalNuc;
@@ -136,12 +146,13 @@ unsigned int TalysData::decayParticles(Event& event) {
 	double eDiff, eDiffMin = 100;
 	// Find starting TALYS bin
 	for (int eCtr = 0; eCtr < nExc; eCtr++) {
-		eDiff = abs(excEnergies[zCur][nCur][eCtr] - xscn->excLevels[event.xscnExState].energyGnd);
+		eDiff = abs(excEnergies[zCur][nCur][eCtr] - xscn->excLevels[event.xscnExState].energyGnd);	
 		if( eDiff < eDiffMin ) {
 			exCur = eCtr;
 			eDiffMin = eDiff; 
 		}
 	}
+	if(exCur==0) cout << "0th energy: " << excEnergies[zCur][nCur][0] << endl;
 	TFile* talysFile = new TFile(talysFileName,"READ");
 	talysFile->cd();
 	while(exCur>0 && zReal>0 && nReal>0) { // If nuclei is excited keep going
@@ -151,6 +162,7 @@ unsigned int TalysData::decayParticles(Event& event) {
 		//decayHists[zCur][nCur][exCur]->Print();//GetRandom2(pTypeD,exOutD); // Random decay
 		int pType = round(pTypeD), exNext = round(exOutD); // Round to integer
 		if(pType==0 && exNext==exCur) continue; // Do not allow decay to same bin...
+		// Find next state
 		int zNext = zCur + ZRED[pType], nNext = nCur + NRED[pType];
 		// Get Maximum and Minimum Possible Energies from Bin Widths and Get a random energy within
 		double minEnergy = (excEnergies[zCur][nCur][exCur] - binW[zCur][nCur][exCur]) - 
@@ -183,9 +195,7 @@ unsigned int TalysData::decayParticles(Event& event) {
 	talysFile->Close();
 
 	// TALYS stops when it reaches ground state of an unstable nuclei, manual particle decay
-	
 	while(true) {
-		int zNext,nNext;
 		if(zReal<=0 || nReal<= 0) break;	
 		double maxSep = 0;
 		int pType = 0;
@@ -200,6 +210,7 @@ unsigned int TalysData::decayParticles(Event& event) {
 		// Output to notify added decay
 		cout << "Z: " << zCur << " N: " << nCur << endl; 
 		cout << "Type: " << pType << " Energy: " << pEnergy << endl; 
+		int zNext = zCur + ZRED[pType], nNext = nCur + NRED[pType];
 		event.addParticle(PDGID[pType],pEnergy,0,1); // Add particle to the event at t=0, as KE
 		// Update Current State
 		zCur = zNext; nCur = nNext;

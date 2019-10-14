@@ -113,6 +113,8 @@ Xscn::Xscn(string cardName, string material, TFile* outFile) { // Constructor
 	// Lepton Energy and Direction Distribution Filled
 	leptonDirEnergyDist = new TH3D((TString)strName+"_leptonDir","Lepton Dir & Energy",
 			20,-1,1,12,0,360,100,0,100);
+	gammaEnergyHist = new TH1D((TString)strName+"_gammaE","Total Gamma Energy",50,0,50);
+	neutronNumberHist = new TH1D((TString)strName+"_neutronN","Total Neutron Number",10,-0.5,9.5);
 }
 
 TH1D* Xscn::readXscn() { // Read Single Diff Xscn
@@ -217,9 +219,11 @@ unsigned int Xscn::randomExLevelAtEnergy(double energy) { // Random Excited Stat
 	// use the highest energy data avilable
 	if(selBin>excProbVsEnergy->GetXaxis()->GetNbins()) 
 		selBin = excProbVsEnergy->GetXaxis()->GetNbins();
+
 	TH1D* excProbAtEnergy = excProbVsEnergy->ProjectionY("exP",selBin,selBin);
 	unsigned int exLevel = round(excProbAtEnergy->GetRandom());
 	delete excProbAtEnergy;
+	if(exLevel==0) cout << "Ground State Interaction!" << endl; 
 	return exLevel;
 }
 

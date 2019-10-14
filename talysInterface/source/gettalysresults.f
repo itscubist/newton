@@ -57,6 +57,10 @@ c Final Energy and Bin Width
         excbinw2 = 0
       endif
       sepenes = S(jz,jn,jpar)
+      if(jpar.eq.0) then
+        sepenes = 0;
+      endif
+        
 
 c Correct for size = last element + 1, and also counting of original
 c state as an excited state

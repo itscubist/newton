@@ -65,6 +65,8 @@ Event::Event(double inEnergy, Xscn &inXscn, Flux &inFlux, Detector &inDet) {
 	
 	//Initialize event totals
 	totalNeutrons = 0;
+	// If final hadron is a neutron increase neutron number
+	if(finalHadron.pdgId == 2112) totalNeutrons++;
 	totalGammaEnergy = 0;
 
 }
@@ -101,8 +103,6 @@ void Event::fillLeptonDirAndEnergy() {
 }
 
 void Event::fillHadronDirAndEnergy() {
-	// If final hadron is a neutron increase neutron number
-	if(finalHadron.pdgId == 2112) totalNeutrons++;
 	// If no hadron, or not simulated
 	if(particles[1].mass==0 || particles[1].isSimulated==false) return; 	
 	double pHz = nuEnergy - xscnCosAngle*particles[0].momentum;	
