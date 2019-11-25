@@ -32,6 +32,9 @@ NUMU 0
 NUMUBAR 0
 NUTAU 0
 NUTAUBAR 0
+# Max Neutrino Energy Considered (even if flux and xscn data extends to higher energyies,
+# interactions will be cut at this energy)
+MAXNUENERGY 132.0
 # Is Double Differential Info Supplied
 DOUBLEDIFF 1
 # Angular Bins [cos(thethaNue)] Supplied

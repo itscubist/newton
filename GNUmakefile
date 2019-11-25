@@ -16,11 +16,9 @@ TARGET = newtonTest
 CXXFLAGS = `root-config --libs --cflags` -I$(INCDIR) -lgfortran
 FCCFLAGS = -I$(TALYS)/source/
 
-#DEPS = $(find $(INCDIR) -name '*.h')
-DEPS = xscn.h flux.h detector.h event.h exstates.h global.h $(TALYS)/source/talys.cmb
+DEPS = xscn.h flux.h detector.h event.h exstates.h global.h organizer.h $(TALYS)/source/talys.cmb
 
-#SRC = $(find $(SRCDIR)/ -name '*.cc')
-SRC = newtonTest.cc xscn.cc flux.cc detector.cc event.cc exstates.cc
+SRC = newtonTest.cc xscn.cc flux.cc detector.cc event.cc exstates.cc organizer.cc
 
 # CPP and FORTRAN OBJECTS
 OBJS = $(SRC:%.cc=$(OBJDIR)/%.o)

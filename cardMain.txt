@@ -1,0 +1,27 @@
+# Main Card File For Organizer 
+# Tells Whic Flux, Xscn or Detector Cards to Use, What Outputs to Save...
+# --- Means Not Existing
+# Organizer Name
+ORG_NAME ORG1
+# DETECTOR CARD TO USE (introduce detector before flux and xscn)
+DETCARD detData/cardSuperK.txt
+# FLUX CARDS TO USE (currently a single flux will be considered, run the generator 2 or more times
+# if your detector is subjected to 2 or more different fluxes)
+01_FLUXCARD fluxData/cardAtmospheric.txt 
+# XSCN CARDS TO USE (all entered channels will be considered)
+01_XSCNCARD xscnData/cardNueO16.txt 
+02_XSCNCARD xscnData/cardNuebarO16.txt 
+03_XSCNCARD xscnData/cardNueEs.txt 
+04_XSCNCARD xscnData/cardNuebarEs.txt 
+05_XSCNCARD xscnData/cardNuxEs.txt 
+06_XSCNCARD xscnData/cardNuxbarEs.txt 
+07_XSCNCARD xscnData/cardIbd.txt 
+#
+# OUTPUT NAMES
+# Output root file name
+ROOTFILENAME newtonTestOut.root 
+# Vector File Name
+VECTORFILENAME newtonTest.kin
+# CONDITIONS FOR OUTPUT
+# max lepton energy condition
+MAXLEPTONENERGY 100

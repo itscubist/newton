@@ -53,6 +53,7 @@ public:
 	int zFinalNuc; // if there is a final nucleus, Z of the nucleus
 	int aFinalNuc; // same as above, A of the nucleus
 	double mLepton; // mass of produced lepton
+	double maxNuEnergy; // maximum neutrino energy considered in interaction (default is 200 MeV)
 	
 	bool writeFinal0; // Whether final hadron should be written to kin file 
 	bool decayFinal0; // Whether final hadron's decay from excited state should be simulated

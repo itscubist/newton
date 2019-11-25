@@ -69,6 +69,7 @@ Xscn::Xscn(string cardName, string material, TFile* outFile) { // Constructor
 			energyBins2 = energyBins; // assume energyBins2 = energyBins if not overwritten later
 		}
 		if(name=="ENERGYBINS2") energyBins2 = stoi(value);
+		if(name=="MAXNUENERGY") maxNuEnergy = stoi(value);
 		if(name=="DOUBLEDIFF") doubleDiff = stoi(value); 		
 		if(name=="EXCDATA") excData = stoi(value); 		
 		if(name=="XSCNDATA") strXscnVsEnergy = value; 		
@@ -245,8 +246,9 @@ double Xscn::randomAzimuth() { // Select A Random Angle, Uniform Accross Azimuth
 
 // Function To Generate Event Counts with Given Flux
 int Xscn::generateEventCountPerEnergy(Flux inFlux, Detector inDet) {
-	eventsVsEnergy = new TH1D((TString)strName+"_evCnt","Poisson",132,0,132);
-	expectedVsEnergy = new TH1D((TString)strName+"_expCnt","Poisson",132,0,132);
+	int nBins = static_cast<int>(maxNuEnergy);
+	eventsVsEnergy = new TH1D((TString)strName+"_evCnt","Poisson",nBins,0,maxNuEnergy);
+	expectedVsEnergy = new TH1D((TString)strName+"_expCnt","Poisson",nBins,0,maxNuEnergy);
 	//Loop over bins and fill them with poisson distributed event counts
 	for (unsigned int bCtr = 1; bCtr <= eventsVsEnergy->GetXaxis()->GetNbins(); bCtr++) {
 		double energy = eventsVsEnergy->GetBinCenter(bCtr);				
