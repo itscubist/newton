@@ -33,6 +33,7 @@ class Organizer{
 public:
 	// Constructor
 	Organizer(std::string cardName);
+	~Organizer();
 
 	// Functions
 	void generateEvents(); // generates events from input det,xscn and flux info
@@ -52,14 +53,14 @@ public:
 	std::vector<Xscn*> xscns;
 	std::vector<Flux*> fluxes;
 	// Created events
-	std::vector<Event*> events;
+	std::vector<Event> events;
 	// Created root output file
 	TFile* rootOutFile;
 	// Created root tree (1 entry per event)
 	TTree* genTree;
 	// Stores event counts for flux and 	
 	std::vector<std::vector<int> > eventCounts;
-	std::vector<std::vector<int> > expectedCounts;
+	std::vector<std::vector<double> > expectedCounts;
 
 
 	// Created debug histograms

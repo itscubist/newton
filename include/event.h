@@ -46,6 +46,7 @@ public:
 
 	// Functions To Write Event to Kin File
 	void writeEvent(std::ofstream &outFile);
+	void writeNuInfo(std::ofstream &outFile);
 	
 	// Lepton is the 0th indice, hadron is the 1st indice, de-excitation stuff is 2nd, 3rd...
 	void fillLeptonDirAndEnergy(); // fill lepton info
@@ -56,6 +57,8 @@ public:
 	
 	// A handy kinematic function
 	TVector3 combineZenAzi(double cosZen1,double azi1, double cosZen2, double azi2);
+	TVector3 combineZenAziRodrigues(double cosZen1,double azi1, double cosZen2, double azi2);
+	TVector3 zenAziToDir(double cosZen, double azi);
 	// Gives a random TVector3
 	TVector3 isotropicDirection();
 
@@ -64,6 +67,7 @@ public:
 	std::string fluxName; // Flux Name
 	double nuEnergy;
 	unsigned int nuFlv;
+	TVector3 nuDir;
 	TVector3 vertex;
 
 	// Info Needed To Calculate Direction and Energy of Output Lepton 
@@ -76,7 +80,7 @@ public:
 	
 	// Info about decays
 	double totalGammaEnergy; // total energy of deexcitation gammas
-	int totalNeutrons; // total energy of deexcitation gammas
+	int totalNeutrons; // total number of emmitted neutrons
 
 	// To check energy/momentum conservation
 	double consEnMom[4];

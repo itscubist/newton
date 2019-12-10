@@ -30,6 +30,14 @@ Detector::Detector(std::string cardName, TFile* outFile) {
 	string line; // dummy to read lines in xscn card
 	string name, value;
 	unsigned int marker;
+	// Place for defaults (if not included in the file)
+	detYears = 500;	
+	fixedEventCount = -1;
+	detCenterOnly = true;
+	yearsToSeconds = 3.1557600; 
+	nAvogadro = 6.0221415; 
+	unitFixer = 0.01; 
+	// End of Defaults, Start of Card Reading Loop
 	while(!detCard.eof()){ // Until File Ends
 		getline(detCard,line); // Get Line
 		if(detCard.eof()) break; // Break if File Ended
@@ -47,6 +55,8 @@ Detector::Detector(std::string cardName, TFile* outFile) {
 		if(name=="DETYEARS") detYears = stod(value); 	
 		if(name=="SECONDSINYEAR") yearsToSeconds  = stod(value); 	
 		if(name=="UNITFIXER") unitFixer = stod(value); 	
+		if(name=="FIXEDEVENTCOUNT") fixedEventCount = stod(value); 	
+		if(name=="DETCENTERONLY") detCenterOnly = stod(value); 	
 		if(name=="DETGEOM") detGeom = value; 		
 		if(name=="DETX") detX = stod(value); 		
 		if(name=="DETY") detY = stod(value); 		
@@ -56,9 +66,21 @@ Detector::Detector(std::string cardName, TFile* outFile) {
 	detCard.close(); 
 	// Unit fixing * Time in Seconds * Number of Atoms in the Detector
 	overallCoeff = unitFixer*(detYears*yearsToSeconds)*(nAvogadro*detMass/molarMass);
-	randCyl = new TF1("randCyl","x*x",0,detR);
-	randSph = new TF1("randSph","x",0,detR);
+	randCyl = new TF1("randCyl","x",0,detR);
+	randSph = new TF1("randSph","x*x",0,detR);
 	detRand.SetSeed(0);
+}
+
+// Function To Give a Detector Vertex According To Specifications
+// Assumes Detector Center is the Center of Coordinate System (0,0,0)
+// If specified gives coordinates only at detector center, otherwise random position
+// within detector
+TVector3 Detector::getInteractionVertex() {
+	if(detCenterOnly==false) return randomInteractionVertex();
+	else {
+		TVector3 dir(0,0,0);
+		return dir;
+	}
 }
 
 // Function To Give a Random Point in the Detector Considering Detector Geometry

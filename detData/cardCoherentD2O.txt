@@ -1,0 +1,42 @@
+# Preliminary!!
+# Card File For Coherent D2O Detector, Information Describing Detector Size, Shape, Material is Here
+# Also have standard info like Avogadro's number, molecular weight of the detector material...
+# Basically what you need to calculate event rate besides flux and xscn
+# --- Means Not Existing
+# Name
+DET_NAME COH_D2O
+# AVOGADRO's NUMBER in units of 10^23 mol^(-1)
+NAVOGADRO 6.0221415
+# Name of material (needed to scale xscns with how many targets per molecule) 
+MATERIAL HEAVYWATER
+# Molecular Mass of the Given Material in grams/mol
+MOLARMASS 20.0276
+# Density of material In (metric)tons/m^3 -> equal to g/cm^3 too
+DENSITY 1.107
+# Mass of the detector in Tons (NOT KiloTons, NOT Kilograms) (fiducial mass in this case)
+DETMASS 1.302
+# Simulation Time (in Years)
+DETYEARS 2.0
+# Years to Seconds Ratio (divided by 10^7)
+SECONDSINYEAR 3.1557600
+# For precision reasons, Xscn is multiplied by 10^38, nAvo by 10^-23, years/seconds by 10^-7  
+# Detector mass is in Tons so a factor of 10^-6 comes from there (using tons instead of grams)
+# To fix these units, the final event count will be multiplied by this number: 0.01
+UNITFIXER 0.01
+# Determines whether event count varies as a Poisson based on the info above, or fixed
+# if negative then Poisson, else fixed number of events for each xscn, the number below
+# is that fixed number of events, ex: If you want to create N events of all interactions,
+# regardless of how many there will be physically, set it to N...
+FIXEDEVENTCOUNT 10000
+# If set (non-zero) then event vertices will all be at 0,0,0
+DETCENTERONLY 1
+# Detector geometry, supported options are: "RECTANGULAR", "CYLINDRICAL" and "SPHERICAL"
+DETGEOM RECTANGULAR
+# Detector Dimensions (give x,y,z for rectangular; z,r for cylenderic; and only r for spheric)
+DETX 60
+DETY 140
+DETZ 140
+DETR 0
+# DETZ and DETR were put to be fiducial sizes wall-200, might update to wall-100 with based on
+# recent developments, then also need to update detector mass
+# Alternatively, one can make the code calculate mass from detector size and density

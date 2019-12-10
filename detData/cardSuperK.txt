@@ -22,6 +22,13 @@ SECONDSINYEAR 3.1557600
 # Detector mass is in Tons so a factor of 10^-6 comes from there (using tons instead of grams)
 # To fix these units, the final event count will be multiplied by this number: 0.01
 UNITFIXER 0.01
+# Determines whether event count varies as a Poisson based on the info above, or fixed
+# if negative then Poisson, else fixed number of events for each xscn, the number below
+# is that fixed number of events, ex: If you want to create N events of all interactions,
+# regardless of how many there will be physically, set it to N...
+FIXEDEVENTCOUNT -1
+# If set (non-zero) then event vertices will all be at 0,0,0
+DETCENTERONLY 0
 # Detector geometry, supported options are: "RECTANGULAR", "CYLINDRICAL" and "SPHERICAL"
 DETGEOM CYLINDRICAL
 # Detector Dimensions (give x,y,z for rectangular; z,r for cylenderic; and only r for spheric)

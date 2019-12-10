@@ -1,0 +1,41 @@
+# Card File For Flux That Is Constant Along Energy, Information Describing the Flux is Here
+# Tells Where to find Flux Files, Which Types of Neutrinos...
+# --- Means Not Existing
+# Name
+FLUX_NAME constE
+# Multiplicative Factor to Make Flux Dimensions in nu/cm2/s/MeV/sr
+# Ignore /sr if flux is coming from a single direction only (beam...)
+SCALE 1.0
+# Multiplicative Factor to Make Energy Dimensions MeV
+ESCALE 1.0
+# How is flux information stored:"txtFile","rootFile","singleEnergy" and "constAlongEnergy" options 
+STORETYPE constAlongEnergy
+# How to get direction info, 0: isotropic, 1: singleAngle,  2: rootFile (in TH3D flux)
+# Beware if not using rootFile option above cannot use rootFile here
+DIRTYPE singleAngle
+# Neutrino flux (only if using singleEnergy or constAlongEnergy) 
+#in nu/cm2/s/MeV when multiplied with SCALE
+NUE 0
+NUMU 0
+NUTAU 0
+NUEBAR 1
+NUMUBAR 0
+NUTAUBAR 0
+# If Using Single Angle Give [cos(thetha)] and azimuth directions (1,0) would be from top
+# (0,0) would be along X axis
+COSTHETA 1
+AZIMUTH 0
+# Energy for singleEnergy, or Minimum Energy for constantAlongEnergy option
+# Use same units as in the txt or root file (will be corrected to MeV later, if you input data
+# is in GeV both ENERGY and ENERGYMAX should also be in GeV) 
+ENERGY 0.0
+# Maximum energy for constantAlongEnergy option
+ENERGYMAX 100
+# Angular Bins [cos(thetha)] Supplied
+ANGBINS 0
+# Azimuth Angle Bins Supplied in phi
+AZIBINS 0
+# Energy Bins Supplied (How many rows of info)
+ENERGYBINS 500
+# Flux Data File Energy and Corresponding Flux Supplied When Reading A Txt File
+FILENAME -

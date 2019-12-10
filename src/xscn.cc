@@ -57,11 +57,12 @@ Xscn::Xscn(string cardName, string material, TFile* outFile) { // Constructor
 		if(name=="ML") mLepton = stod(value); 	
 		if(name=="WRITE_F") writeFinal0 = stoi(value); 	
 		if(name=="DECAY_F") decayFinal0 = stoi(value); 		
+		// Read the next 6 in SNOWGLOBES order
 		if(name=="NUE") intNu[0] = stoi(value); 	
-		if(name=="NUEBAR") intNu[1] = stoi(value); 	
-		if(name=="NUMU") intNu[2] = stoi(value); 	
-		if(name=="NUMUBAR") intNu[3] = stoi(value); 	
-		if(name=="NUTAU") intNu[4] = stoi(value); 	
+		if(name=="NUEBAR") intNu[3] = stoi(value); 	
+		if(name=="NUMU") intNu[1] = stoi(value); 	
+		if(name=="NUMUBAR") intNu[4] = stoi(value); 	
+		if(name=="NUTAU") intNu[2] = stoi(value); 	
 		if(name=="NUTAUBAR") intNu[5] = stoi(value); 	
 		if(name=="ANGBINS") angBins = stoi(value); 		
 		if(name=="ENERGYBINS") {
@@ -256,22 +257,39 @@ int Xscn::generateEventCountPerEnergy(Flux inFlux, Detector inDet) {
 		double poissonPar = 0;
 		for (unsigned int fCtr = 0; fCtr <6; fCtr++) { // Sum over all Flavors That Do This
 			if(intNu[fCtr]==true) poissonPar += inFlux.fluxAtEnergy(energy,fCtr)*xscnAtEnergy(energy);
+			cout <<"Energy Bin: " << bCtr <<" Flavor: " << fCtr << " Flux: " << 
+				inFlux.fluxAtEnergy(energy, fCtr) << endl;
 		}
 		// Weigh By How Many Target and How Much Time
 		poissonPar*=inDet.overallCoeff*targetPerMolecule;
-
+		// Fill expected event count per energy histogram (aka. Poisson means)
+		expectedVsEnergy->SetBinContent(bCtr,poissonPar);			
+	}
+		
+	if(inDet.fixedEventCount<=0) { // If using poisson fluctuations...
+		for (unsigned int bCtr = 1; bCtr <= eventsVsEnergy->GetXaxis()->GetNbins(); bCtr++) {
 		// Get Event Count, Fill Histogram
-		double evCount = xscnRand.Poisson(poissonPar);
-		eventsVsEnergy->SetBinContent(bCtr,evCount);
-		expectedVsEnergy->SetBinContent(bCtr,poissonPar);
+		double poissonPar = expectedVsEnergy->GetBinContent(bCtr); // get poisson mean
+		int evCount = xscnRand.Poisson(poissonPar); // find poisson fluctuation
+		eventsVsEnergy->SetBinContent(bCtr,evCount); // set bin content to that fluctuation
 		// Create Events
 		if(evCount<1) continue;
-		for (int eCtr = 0; eCtr < evCount; eCtr++) {
+		for (int eCtr = 0; eCtr < evCount; eCtr++) { // Loop over bins, and create events with that energy
 			double evEnergy = xscnRand.Uniform(eventsVsEnergy->GetXaxis()->GetBinLowEdge(bCtr),
 					eventsVsEnergy->GetXaxis()->GetBinLowEdge(bCtr+1));
 			genEnergies.push_back(evEnergy);
+			}
 		}
 	}
+
+	else if(inDet.fixedEventCount>0) { // If creating fixed number of events
+		for (unsigned int eCtr = 0; eCtr < inDet.fixedEventCount ; eCtr++) {
+			double evEnergy = expectedVsEnergy->GetRandom(); // get random energy for each event 
+			eventsVsEnergy->Fill(evEnergy); // fill event histogram with the obtained random energy
+			genEnergies.push_back(evEnergy); // to later create an event with that energy
+		}
+	}
+	
 	return eventsVsEnergy->Integral();
 }
 

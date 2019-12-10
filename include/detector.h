@@ -27,6 +27,8 @@ public:
 	
 	// Function To Give a Random Point in the Detector Considering Detector Geometry
 	TVector3 randomInteractionVertex();
+	// Gives a Vertex Point Within the Detector According To the Specification in the Card File
+	TVector3 getInteractionVertex();
 
 	// Variables Filled From Card File
 	std::string strName; // name
@@ -39,6 +41,10 @@ public:
 	double yearsToSeconds; // *10^-7 
 	double unitFixer; // fixes the units (see card file
 	double overallCoeff; // so that this times*xscn*flux will give event count at given energy,angle...
+	
+	bool detCenterOnly; // If true, events are created at detector center only
+	int fixedEventCount; // If greater than 0, specified number of events are created for each xscn
+	// otherwise number of event will be determined by flux, xscn, detSize and # of years,...
 	
 	std::string detGeom; // Whether detector is rectangular,cylindirical or spherical
 	double detX, detY, detZ, detR;

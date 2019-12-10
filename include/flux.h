@@ -57,8 +57,9 @@ private:
 	// RNG
 	TRandom3 fluxRand;
 	
-	std::vector<TH3D*> buildSingleEnergyFlux();
-	std::vector<TH3D*> buildConstantAlongEnergyFlux();
+	void readFlux();
+	void buildSingleEnergyFlux();
+	void buildConstantAlongEnergyFlux();
 
 	// File and Histogram Names (From Card File
 	std::string strFluxFileName;

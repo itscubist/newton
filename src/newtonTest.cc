@@ -1,7 +1,7 @@
 /********
 *Author: Baran Bodur
 *Date:2019-09-10
-*Description: Test file for earky features of NEWTON
+*Description: Test file for early features of NEWTON
 *
 ********/
 
@@ -158,8 +158,8 @@ int main(int argc, const char *argv[]) {
 	TH1D* aziTestH = new TH1D("aziTestH","Azimuth",12,0,360);
 	TH1D* zenTestH = new TH1D("zenTestH","Azimuth",20,-1,1);
 	TH1D* zTestH = new TH1D("zTestH","z",100,-superK.detZ,superK.detZ);
-	TH1D* xTestH = new TH1D("xTestH","x",100,-superK.detZ,superK.detZ);
-	TH1D* yTestH = new TH1D("yTestH","y",100,-superK.detZ,superK.detZ);
+	TH1D* xTestH = new TH1D("xTestH","x",100,-superK.detX,superK.detX);
+	TH1D* yTestH = new TH1D("yTestH","y",100,-superK.detY,superK.detY);
 	TH1D* rTestH = new TH1D("rTestH","r",100,0,superK.detR);
 	for (int i = 0; i <10000; i++) {
 		unsigned int randEx = nueOXscn.randomExLevelAtEnergy(100); 

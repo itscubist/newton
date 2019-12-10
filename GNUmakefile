@@ -9,7 +9,7 @@ OBJDIR = obj
 EXECDIR = .
 FSRCDIR = talysInterface/source
 FOBJDIR = talysInterface/obj
-TARGET = newtonTest
+TARGET = newtonRun
 
 #Compiler flags
 # Enable Root Usage, Include Headers, Usage of Fortran Code in C++
@@ -18,7 +18,7 @@ FCCFLAGS = -I$(TALYS)/source/
 
 DEPS = xscn.h flux.h detector.h event.h exstates.h global.h organizer.h $(TALYS)/source/talys.cmb
 
-SRC = newtonTest.cc xscn.cc flux.cc detector.cc event.cc exstates.cc organizer.cc
+SRC = newtonRun.cc xscn.cc flux.cc detector.cc event.cc exstates.cc organizer.cc
 
 # CPP and FORTRAN OBJECTS
 OBJS = $(SRC:%.cc=$(OBJDIR)/%.o)

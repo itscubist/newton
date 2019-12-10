@@ -216,7 +216,12 @@ unsigned int TalysData::decayParticles(Event& event) {
 		zCur = zNext; nCur = nNext;
 		zReal = zReal - ZRED[pType]; nReal = nReal - NRED[pType];
 		pCtr++; // increase decay particle count	
-	}	
+	}
+	// Since 15O and 16N beta decays, write those into file too, maybe geant will simulate their
+	// decay: Do not count as emitted particles though...
+	if(zReal==8 && nReal == 7) event.addParticle(1000080150,0,0,1);
+	if(zReal==7 && nReal == 9) event.addParticle(1000070160,0,0,1);
+
 	return pCtr;	
 }
 

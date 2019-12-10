@@ -26,7 +26,7 @@ Event::Event(double inEnergy, Xscn &inXscn, Flux &inFlux, Detector &inDet) {
 	fluxName = inFlux.strName;
 	nuEnergy = inEnergy;
 	// Get Random Vertex According to Detector Geometry
-	vertex = inDet.randomInteractionVertex(); 
+	vertex = inDet.getInteractionVertex(); 
 	// Should fix this part later, for selecting a neutrino flavor
 	for (int fCtr = 0; fCtr < 6; fCtr++) {
 		nuFlv = fCtr; if(inXscn.intNu[fCtr]==true) break;
@@ -34,12 +34,16 @@ Event::Event(double inEnergy, Xscn &inXscn, Flux &inFlux, Detector &inDet) {
 	// Get Random angles, excited states, directions ...
 	fluxCosZen = inFlux.randomZenithAtEnergy(nuEnergy,nuFlv); 
 	fluxAzi = inFlux.randomAzimuthAtEnergyAndZenith(nuEnergy,fluxCosZen,nuFlv); 
+	nuDir = zenAziToDir(fluxCosZen, fluxAzi);
 	xscnExState = inXscn.randomExLevelAtEnergy(nuEnergy); 
 	initialTargetMass = inXscn.mTarget;
-	finalHadMass = inXscn.mFinal0 + inXscn.excLevels[0].energyGnd;
+	// Get mass of the final state (need to calculate energy available to the electron)
+	finalHadMass = inXscn.mFinal0 + inXscn.excLevels[xscnExState].energyGnd;
+	//cout << "Ex State: " << xscnExState << " Mass of Final Hadron: " << finalHadMass << endl; 
 	xscnCosAngle = inXscn.randomAngleAtEnergy(nuEnergy, xscnExState);
 	xscnAzi = inXscn.randomAzimuth();
-	
+
+
 	// Lepton From Scattering - particle[0]
 	Particle chLepton;
 	chLepton.pdgId = inXscn.pdgLepton;
@@ -133,6 +137,8 @@ void Event::addParticle(int pdgId, double energy, TVector3 direction, double tim
 	if(pdgId==1000010030) decayP.mass = 2809.432; // triton
 	if(pdgId==1000020030) decayP.mass = 2809.413; // He-3
 	if(pdgId==1000020040) decayP.mass = 3728.401; // alpha
+	if(pdgId==1000080150) decayP.mass = 13975,266; // 15O (unstable so decays might matter)
+	if(pdgId==1000070160) decayP.mass = 14909.588; // 16N (unstable so decays might matter)
 	decayP.energy = energy;
 	if(isKE) decayP.energy += decayP.mass; // if input is kinetic energy
 	decayP.momentum = sqrt(pow(decayP.energy,2)-pow(decayP.mass,2));
@@ -177,6 +183,15 @@ void Event::writeEvent(ofstream &outFile) {
 	return;
 }
 
+// Writes true info: Neutrino Energy, Neutrino Direction
+void Event::writeNuInfo(ofstream &outFile) {
+	outFile << "$ begin" << endl;
+	outFile << nuEnergy << " " << nuDir.X() << " " << nuDir.Y() << " " << nuDir.Z() << endl;
+	outFile << "$ end" << endl;
+	return;
+}
+
+
 // Gives a unit magnitude TVector in a random direction
 TVector3 Event::isotropicDirection() {
 	TVector3 dir(0,0,1.0);
@@ -211,4 +226,42 @@ TVector3 Event::combineZenAzi(double cosZen1,double azi1, double cosZen2, double
 	combinedDir = sinZen2*cosAzi2*xPrime + sinZen2*sinAzi2*yPrime + cosZen2*zPrime;
 	combinedDir.SetMag(1.0);
 	return combinedDir;
+}
+
+// A handy kinematic function to combine zenith and azimuth
+TVector3 Event::combineZenAziRodrigues(double cosZen1,double azi1, double cosZen2, double azi2) {
+	// Get sines and cosines
+	double sinZen1 = sqrt(1-pow(cosZen1,2));	
+	double sinZen2 = sqrt(1-pow(cosZen2,2));	
+	double sinAzi1 = sin(DegToRad()*azi1);	
+	double sinAzi2 = sin(DegToRad()*azi2);	
+	double cosAzi1 = cos(DegToRad()*azi1);	
+	double cosAzi2 = cos(DegToRad()*azi2);	
+	// Construct coordinate vectors with z axis in neutrino direction
+	TVector3 z, zPrime, rotAxis, oriDir, combinedDir;
+	z.SetXYZ(0,0,1);
+	zPrime.SetXYZ(sinZen1*cosAzi1,sinZen1*sinAzi1,cosZen1);
+	if(zPrime(2)>=1) combinedDir.SetXYZ(sinZen2*cosAzi2,sinZen2*sinAzi2,cosZen2);
+	else if(zPrime(2) <= -1) combinedDir.SetXYZ(-1*sinZen2*cosAzi2,-1*sinZen2*sinAzi2,-1*cosZen2);
+	else {
+		rotAxis = zPrime.Cross(z);
+		rotAxis.SetMag(1.0);
+		oriDir.SetXYZ(sinZen2*cosAzi2,sinZen2*sinAzi2,cosZen2);
+		oriDir.SetMag(1.0);
+		// Combine to get electron direction in detector frame via Rodrigues' formula
+		combinedDir=oriDir*cosZen1+rotAxis.Cross(oriDir)*sinZen1+rotAxis*rotAxis.Dot(oriDir)*(1-cosZen1);
+		combinedDir.SetMag(1.0);
+	}
+	return combinedDir;
+}
+
+// Convert zenith and azimuth to direction vector 
+TVector3 Event::zenAziToDir(double cosZen, double azi) {
+	// Get sines and cosines
+	double sinZen = sqrt(1-pow(cosZen,2));	
+	double sinAzi = sin(DegToRad()*azi);	
+	double cosAzi = cos(DegToRad()*azi);	
+	TVector3 dir;
+	dir.SetXYZ(sinZen*cosAzi,sinZen*sinAzi,cosZen);
+	return dir;
 }

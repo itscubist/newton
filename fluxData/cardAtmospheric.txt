@@ -12,14 +12,14 @@ STORETYPE rootFile
 # How to get direction info, 0: isotropic, 1: singleAngle,  2: rootFile (in forms
 # Beware if not using rootFile option above cannot use rootFile here
 DIRTYPE rootFile
-# Neutrino flux (only if using singleEnergy or constAlongEnergy) 
-#in nu/cm2/s/MeV when multiplied with SCALE
-NUE 0
-NUEBAR 100
-NUMU 0
-NUMUBAR 0
-NUTAU 0
-NUTAUBAR 0
+# Neutrino flux (like scale but by flavor) (useful for using singleEnergy or constAlongEnergy)
+# in nu/cm2/s/MeV when multiplied with SCALE
+NUE 1
+NUMU 1
+NUTAU 1
+NUEBAR 1
+NUMUBAR 1
+NUTAUBAR 1
 # If Using Single Angle Give [cos(thetha)] and azimuth directions (1,0) would be from top
 COSTHETA 1
 AZIMUTH 0
@@ -33,12 +33,12 @@ ANGBINS 20
 AZIBINS 12
 # Energy Bins Supplied (How many rows of info)
 ENERGYBINS 501
-# Flux Data File When Reading From A Rootfile
-ROOTFILENAME fluxData/Honda3DFlux2011to200MeV_20zenBin.root
+# Flux Data File When Reading From a *.root or *.txt File
+FILENAME fluxData/Honda3DFlux2011to200MeV_20zenBin.root
 # TH3D Histogram Names For Flavors in the supplied rootfile
 H_NUE flux_flavor12_osc1_sol1
-H_NUEBAR flux_flavor-12_osc1_sol1
 H_NUMU flux_flavor14_osc1_sol1
-H_NUMUBAR flux_flavor-14_osc1_sol1
 H_NUTAU flux_flavor16_osc1_sol1
+H_NUEBAR flux_flavor-12_osc1_sol1
+H_NUMUBAR flux_flavor-14_osc1_sol1
 H_NUTAUBAR flux_flavor-16_osc1_sol1
