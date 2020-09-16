@@ -25,6 +25,7 @@ class Flux{
 public:
 	// Constructor
 	Flux(std::string cardName, TFile* outFile);
+	//~Flux();
 	
 	// Functions Related To Getting Info
 	double fluxAtEnergy(double energy, unsigned int flavor);

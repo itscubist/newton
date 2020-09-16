@@ -31,6 +31,7 @@ class Xscn{
 public:
 	// Constructor
 	Xscn(std::string cardName, std::string material, TFile* outFile);
+	//~Xscn();
 
 	// Functions To Get Xscn At Asked Values
 	double xscnAtEnergy(double energy);
@@ -45,6 +46,7 @@ public:
 	std::string strName; // name
 	double targetPerMolecule; // how many targets per molecule
 	unsigned int nFinalStates; // number of possible final states (nuclear excitation and so on)
+	int nuanceCode; // pdg of target
 	int pdgTarget; // pdg of target
 	int pdgFinal0; // pdg of produced final nucleus, hadron...
 	int pdgLepton; // pdg of procuded lepton
@@ -80,9 +82,9 @@ public:
 	TH1D* gammaEnergyHist;
 	TH1D* neutronNumberHist;
 
-private:
 	// RNG
 	TRandom3 xscnRand; 
+private:
 
 	// Functions for Initialization
 	TH1D* readXscn(); // Read Single Diff Xscn

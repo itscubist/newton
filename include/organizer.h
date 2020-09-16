@@ -61,7 +61,10 @@ public:
 	// Stores event counts for flux and 	
 	std::vector<std::vector<int> > eventCounts;
 	std::vector<std::vector<double> > expectedCounts;
-
+	// nuance on?
+	bool nuanceCodeOn=true;
+	bool sepTrueNu=false;
+	bool batchMode=false;
 
 	// Created debug histograms
 	//

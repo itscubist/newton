@@ -71,6 +71,7 @@ public:
 	void textOutput(); // initialize huge arrays of histograms
 	void setFileName(TString inString); // sets name of decay histogram save file
 	TString getHName(int z, int n, int exc); // get a string for given values
+	int getPdg(int zIn, int nIn); // get pdg id of a nucles with given z and n
 
 	// Get a decay particle from decay histograms 
 	unsigned int decayParticles(Event& event);
