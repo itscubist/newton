@@ -92,7 +92,7 @@ Flux::Flux(string cardName, TFile* outFile) {
 	fluxRand.SetSeed(0);
 }
 
-// Read vsEnergy Fluxes From txt File
+// Read vs Energy Fluxes From txt File
 void Flux::readFlux() { // Read Single Diff Xscn
 	ifstream inFile(strFluxFileName);
 	string line;
@@ -205,3 +205,15 @@ double Flux::randomAzimuthAtEnergyAndZenith(double energy, double cosAngle, unsi
 	return azimuth;
 
 }
+
+/*
+// Destructor
+Flux::~Flux() {
+	for(unsigned int v=0;v<fluxVsEnergy.size();v++) {
+		delete fluxVsEnergy[v];
+	}
+	for(unsigned int v=0;v<fluxVsEnergyDirectional.size();v++) {
+		delete fluxVsEnergyDirectional[v];
+	}
+}
+*/

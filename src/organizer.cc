@@ -35,6 +35,9 @@ Organizer::Organizer(string cardName) {
 		name = line.substr(0,marker); // Get Parameter Name
 		cout << name << " - " << value <<  endl;
 		if(name=="ORG_NAME") strName = value;
+		if(name=="NUANCECODE_ON") nuanceCodeOn = stoi(value);
+		if(name=="BATCHMODE_ON") batchMode = stoi(value);
+		if(name=="SEPTRUENU") sepTrueNu = stoi(value);
 		if(name=="ROOTFILENAME") rootFileName = value;	
 		if(name=="VECTORFILENAME") vectorFileName = value;
 		if(name=="DETCARD") detCard = value;
@@ -49,7 +52,7 @@ Organizer::Organizer(string cardName) {
 	// Construct root file, detector, xscns and fluxes based on card file input
 	rootOutFile = new TFile((TString)rootFileName,"RECREATE"); 		
 	detector = new Detector(detCard,rootOutFile);	
-	cout << "# of Flux Cards: " << fluxCards.size() << " # of Xscn Cards: " << xscnCards.size() << endl;
+	cout<< "# of Flux Cards: " << fluxCards.size() << " # of Xscn Cards: " << xscnCards.size() << endl;
 	for (unsigned int i = 0; i < fluxCards.size(); i++) { // construct fluxes
 		Flux* tempFlux = new Flux(fluxCards[i],rootOutFile);	
 		fluxes.push_back(tempFlux);
@@ -62,6 +65,12 @@ Organizer::Organizer(string cardName) {
 	}
 	orgCard.close();	
 	orgRand.SetSeed(0);
+
+	if(batchMode) {
+		ofstream outText(vectorFileName); // open and close file to clear it, before append
+		outText.close(); // close file
+	}
+
 }
 
 
@@ -72,13 +81,21 @@ Organizer::~Organizer() {
 
 // Function that generates events for input xscn and fluxes
 void Organizer::generateEvents() {
+	//Detector tempD = *detector;
 	for (unsigned int fCtr = 0; fCtr < fluxes.size(); fCtr++) {
+		//Flux tempF = *fluxes[fCtr];
+		
 		vector<int> tempVecEv;
 		vector<double> tempVecExp; 	
 		cout << "******* Events From Flux: " << fluxes[fCtr]->strName << " **********" << endl;
 		for (unsigned int xCtr = 0; xCtr < xscns.size(); xCtr++) {
+			//Xscn tempX = *xscns[xCtr];
 			// Get number of events generated (and expected) for each energy bin
+			
 			int tempEv = xscns[xCtr]->generateEventCountPerEnergy(*fluxes[fCtr], *detector);
+			
+			//int tempEv = xscns[xCtr]->generateEventCountPerEnergy(tempF, tempD);
+			
 			double tempExp = xscns[xCtr]->expectedVsEnergy->Integral();	
 			tempVecEv.push_back(tempEv); // event counts per flux per xscn
 			tempVecExp.push_back(tempExp); // expected counts per flux per xscn
@@ -86,13 +103,26 @@ void Organizer::generateEvents() {
 			cout << "Total " << xscns[xCtr]->strName << " Events: " << tempEv << endl;
 			cout << "Expected " << xscns[xCtr]->strName << " Events: " << tempExp << endl;
 			for (unsigned int eCtr = 0; eCtr < xscns[xCtr]->genEnergies.size(); eCtr++) {
+
+			  //Event tempEvent(xscns[xCtr]->genEnergies[eCtr],tempX,tempF,tempD);
 				Event tempEvent(xscns[xCtr]->genEnergies[eCtr],*xscns[xCtr],*fluxes[fCtr],*detector);
+				
 				// If can decay, and decay is requested
 				if(xscns[xCtr]->nFinalStates>1 && xscns[xCtr]->decayFinal0==true) {
 					xscns[xCtr]->talysDecayer.decayParticles(tempEvent);
 				}
-				events.push_back(tempEvent);
-				double tempCosZen = tempEvent.particles[0].direction.CosTheta();
+				if(eCtr%1000==0) {
+					cout << "Simulating Event: " << eCtr+1 << "/" << 
+						xscns[xCtr]->genEnergies.size() << " of xscn: " <<
+						xscns[xCtr]->strName << endl;
+				}
+				if(!batchMode) events.push_back(tempEvent); // if not batch mode store event
+				if(batchMode) { // if batch mode save event now
+					ofstream outText(vectorFileName, ofstream::app); // open file and append
+					tempEvent.writeEvent(outText, nuanceCodeOn); // write event now
+					outText.close(); // close file
+				}
+				double tempCosZen = -1*tempEvent.particles[0].direction.CosTheta();
 				double tempAzi = tempEvent.particles[0].direction.Phi()*RadToDeg();
 				if(tempAzi<0) tempAzi+=360.0;
 				double tempEne = tempEvent.particles[0].energy;
@@ -109,18 +139,21 @@ void Organizer::generateEvents() {
 
 // Function saves events to tree and kin files with truth info
 void Organizer::saveEvents() {
+	if(batchMode) return; // if batch mode on then do not write all events at once
 	// out Kinematic File
 	ofstream outText(vectorFileName);
-	ofstream outTrue(vectorFileName+".trueNu");
 	rootOutFile->cd();
 	//genTree = new TTree("genTree","tree containing all created event info");
   //genTree->Branch("xscnName",tempEvent,"eventNo/C");
 	for (int eCtr = 0; eCtr < events.size(); eCtr++) {
-		events[eCtr].writeEvent(outText);
-		events[eCtr].writeNuInfo(outTrue);
+		events[eCtr].writeEvent(outText, nuanceCodeOn);
 	}
 	outText.close();
-	outTrue.close();
+	if(sepTrueNu) {
+		ofstream outTrue(vectorFileName+".trueNu");
+		for (int eCtr = 0; eCtr < events.size(); eCtr++) events[eCtr].writeNuInfo(outTrue);
+		outTrue.close();
+	}
 }
 
 // Function saves diagnostic histograms into root file
@@ -138,8 +171,9 @@ void Organizer::plotHists() {
 		aziTestH = new TH1D("aziTestH_"+(TString)fluxes[fCtr]->strName,"Azimuth",12,0,360);
 		zenTestH = new TH1D("zenTestH_"+(TString)fluxes[fCtr]->strName,"Cos Zenith",20,-1,1);
 		for (int i = 0; i < 10000; i++) {
-			zenTestH->Fill(fluxes[fCtr]->randomZenithAtEnergy(100,0));
-			aziTestH->Fill(fluxes[fCtr]->randomAzimuthAtEnergyAndZenith(100,0.0,0));
+			double tempEne = 31.6; //100;
+			zenTestH->Fill(fluxes[fCtr]->randomZenithAtEnergy(tempEne,0));
+			aziTestH->Fill(fluxes[fCtr]->randomAzimuthAtEnergyAndZenith(tempEne,0.0,0));
 		}
 		zenTestH->Write();
 		aziTestH->Write();
@@ -181,13 +215,13 @@ void Organizer::plotHists() {
 		xscns[xCtr]->gammaEnergyHist->Write();
 		xscns[xCtr]->neutronNumberHist->Write();
 		hZen = xscns[xCtr]->leptonDirEnergyDist->
-				ProjectionX(zenName + (TString)xscns[xCtr]->strName,1,12,30,100,"e");
+				ProjectionX(zenName + (TString)xscns[xCtr]->strName,1,12,0,100,"e");
 		//hZen->GetXaxis()->SetTitle("Lepton Energy (MeV)");
 		//hZen->GetYaxis()->SetTitle("Events/22.5kTon/20years/cosBin");
 		hZen->SetLineWidth(2);
 		hZen->Write();		
 		hAzi = xscns[xCtr]->leptonDirEnergyDist->
-				ProjectionY(aziName+(TString)xscns[xCtr]->strName,5,15,30,100,"e");
+				ProjectionY(aziName+(TString)xscns[xCtr]->strName,5,15,0,100,"e");
 		//hAzi->GetXaxis()->SetTitle("Lepton Energy (MeV)");
 		//hAzi->GetYaxis()->SetTitle("Events/22.5kTon/20years/30 Degrees");
 		hAzi->SetLineWidth(2);
@@ -199,6 +233,8 @@ void Organizer::plotHists() {
 		hE->SetLineWidth(2);
 		cout << "30-100 MeV Lepton Count in: " << xscns[xCtr]->strName << " is: " << 
 			hE->Integral(30,100) << endl; 
+		cout << "50-100 MeV Lepton Count in: " << xscns[xCtr]->strName << " is: " << 
+			hE->Integral(50,100) << endl; 
 		hE->Write();
 		// Delete
 		delete hE; delete hZen; delete hAzi;

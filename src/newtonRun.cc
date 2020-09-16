@@ -48,8 +48,10 @@ int main(int argc, const char *argv[]) {
 	cout << "Read Input From Card Files, Initialized" << endl; 
 	orgMain.generateEvents(); // generates events from input det,xscn and flux info
 	cout << "Generated Events" << endl;
-	orgMain.saveEvents(); // saves events to ttree in root file and a kinematics file
-	cout << "Saved Events" << endl;
+	if( !orgMain.batchMode) { // if batch mode is on events are saved on the go
+		orgMain.saveEvents(); // saves events to ttree in root file and a kinematics file
+		cout << "Saved Events" << endl;
+	}
 	orgMain.plotHists(); // plot histograms
 	cout << "Plotted Histograms to Check" << endl;
 /*
@@ -63,12 +65,12 @@ int main(int argc, const char *argv[]) {
 					cout << "Zen1: " << zen[z1] << " Zen2: " << zen[z2] 
 						<< " Azi1: " << azi[a1] << " Azi2: " << azi[a2] << endl;
 					TVector3 resNormal = orgMain.events[0].combineZenAzi(zen[z1],azi[a1],zen[z2],azi[a2]);
-					TVector3 resRodrigues = 
-						orgMain.events[0].combineZenAziRodrigues(zen[z1],azi[a1],zen[z2],azi[a2]);
+					TVector3 resNew = 
+						orgMain.events[0].combineZenAziDot(zen[z1],azi[a1],zen[z2],azi[a2]);
 					cout << "My old method" << endl;
 					resNormal.Print(); 
-					cout << "With Rodrigues' formula" << endl;
-					resRodrigues.Print();
+					cout << "With new robust formula" << endl;
+					resNew.Print();
 					//cout << "Normal: " <<  << " Rodrigues': " << zen[z2] << endl;
 				}
 			}

@@ -218,12 +218,23 @@ unsigned int TalysData::decayParticles(Event& event) {
 		pCtr++; // increase decay particle count	
 	}
 	// Since 15O and 16N beta decays, write those into file too, maybe geant will simulate their
-	// decay: Do not count as emitted particles though...
-	if(zReal==8 && nReal == 7) event.addParticle(1000080150,0,0,1);
-	if(zReal==7 && nReal == 9) event.addParticle(1000070160,0,0,1);
+	// decay: Do not count as emitted particles though...	
+	if(zReal>=1 && nReal>=0) event.addParticle(getPdg(zReal,nReal),0,0,1);
+	
+	//if(zReal==8 && nReal == 7) event.addParticle(1000080150,0,0,1);
+	//if(zReal==7 && nReal == 9) event.addParticle(1000070160,0,0,1);
 
 	return pCtr;	
 }
+
+// Return pdg of a nucleus from its proton and neutron numbers
+int TalysData::getPdg(int zIn, int nIn) {
+	int pdgId = 1000000000;
+	pdgId += zIn*10000;
+	pdgId += (zIn+nIn)*10;
+	return pdgId;
+}
+
 
 void TalysData::textOutput() { // Just to test accessibility of TALYS  results
 	int jZ=0, jN=0, jPar=2, jExc=4, jExcout=0; 

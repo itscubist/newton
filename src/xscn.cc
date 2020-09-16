@@ -39,6 +39,7 @@ Xscn::Xscn(string cardName, string material, TFile* outFile) { // Constructor
 			nFinalStates = stoi(value); 	
 			//strXscnVsEnergyAndAngle.reserve(nFinalStates);
 		}
+		if(name=="NUANCECODE") nuanceCode = stoi(value);
 		if(name=="PDGT") pdgTarget = stoi(value); 	
 		if(name=="PDGF") {
 			pdgFinal0 = stoi(value);
@@ -257,8 +258,8 @@ int Xscn::generateEventCountPerEnergy(Flux inFlux, Detector inDet) {
 		double poissonPar = 0;
 		for (unsigned int fCtr = 0; fCtr <6; fCtr++) { // Sum over all Flavors That Do This
 			if(intNu[fCtr]==true) poissonPar += inFlux.fluxAtEnergy(energy,fCtr)*xscnAtEnergy(energy);
-			cout <<"Energy Bin: " << bCtr <<" Flavor: " << fCtr << " Flux: " << 
-				inFlux.fluxAtEnergy(energy, fCtr) << endl;
+			//cout <<"Energy Bin: " << bCtr <<" Flavor: " << fCtr << " Flux: " << 
+			//	inFlux.fluxAtEnergy(energy, fCtr) << endl;
 		}
 		// Weigh By How Many Target and How Much Time
 		poissonPar*=inDet.overallCoeff*targetPerMolecule;
@@ -266,15 +267,19 @@ int Xscn::generateEventCountPerEnergy(Flux inFlux, Detector inDet) {
 		expectedVsEnergy->SetBinContent(bCtr,poissonPar);			
 	}
 		
-	if(inDet.fixedEventCount<=0) { // If using poisson fluctuations...
+	if(inDet.fixedEventCount<=0) { // If using # of events expected in given time/det volume...
 		for (unsigned int bCtr = 1; bCtr <= eventsVsEnergy->GetXaxis()->GetNbins(); bCtr++) {
 		// Get Event Count, Fill Histogram
 		double poissonPar = expectedVsEnergy->GetBinContent(bCtr); // get poisson mean
-		int evCount = xscnRand.Poisson(poissonPar); // find poisson fluctuation
+		int evCount;
+		if(inDet.fixedEventCount<0) // If smaller than zero add poisson fluctuations
+			evCount = xscnRand.Poisson(poissonPar); // find poisson fluctuation
+		else if(inDet.fixedEventCount==0) // If equal to zero then use closest integer
+			evCount = round(poissonPar); // round to nearest int
 		eventsVsEnergy->SetBinContent(bCtr,evCount); // set bin content to that fluctuation
 		// Create Events
 		if(evCount<1) continue;
-		for (int eCtr = 0; eCtr < evCount; eCtr++) { // Loop over bins, and create events with that energy
+		for (int eCtr = 0; eCtr < evCount; eCtr++) { //Loop over bins, and create events with that energy
 			double evEnergy = xscnRand.Uniform(eventsVsEnergy->GetXaxis()->GetBinLowEdge(bCtr),
 					eventsVsEnergy->GetXaxis()->GetBinLowEdge(bCtr+1));
 			genEnergies.push_back(evEnergy);
@@ -293,4 +298,17 @@ int Xscn::generateEventCountPerEnergy(Flux inFlux, Detector inDet) {
 	return eventsVsEnergy->Integral();
 }
 
-
+/*
+// Destructor
+Xscn::~Xscn() {
+	delete xscnVsEnergy;
+	delete excProbVsEnergy;
+	delete eventsVsEnergy;
+	delete leptonDirEnergyDist;
+	delete gammaEnergyHist;
+	delete neutronNumberHist;
+	for(unsigned int v=0;v<xscnVsEnergyAngle.size();v++) {
+		delete xscnVsEnergyAngle[v];
+	}
+}
+*/
