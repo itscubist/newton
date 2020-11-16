@@ -80,6 +80,8 @@ public:
 	std::vector<double> genEnergies;
 	TH3D* leptonDirEnergyDist;
 	TH1D* gammaEnergyHist;
+	TH1D* gammaIndEnergyHist;
+	std::vector<TH1D*> gammaIndEnergyByExcHistVec;
 	TH1D* neutronNumberHist;
 
 	// RNG

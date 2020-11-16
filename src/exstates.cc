@@ -81,6 +81,9 @@ void TalysData::initHists() {
 	float decProb,sepEnergy,excEnergy1,excBinWidth1,excEnergy2,excBinWidth2;
 	gettalysresults_(&tZ,&tN,&tPar,&tExc,&tExcout,&nZ,&nN,&nPar,&nExc,&nExcout,
 			&decProb,&excEnergy1,&excBinWidth1,&excEnergy2,&excBinWidth2,&sepEnergy);
+	// For testing purposes only
+	ofstream outBinEne(talysFileName+"_binEne.dat");
+	
 	// Z and N loop means how many protons or neutron less than the initial nucleus
 	for (int z = 0; z < nZ; z++) {// loop over Z non zero histograms
 		for (int n = 0; n < nN; n++) {// loop over N
@@ -107,11 +110,19 @@ void TalysData::initHists() {
 				} // end of particle type
 				excEnergies[z][n][e] = static_cast<double>(excEnergy1);
 				binW[z][n][e] = static_cast<double>(excBinWidth1);
+				// Output excEne and binWidths for testing
+				outBinEne << "Z: " << z << " N: " << n << " Exc.: " << e 
+					<< " Exc. Energy: " << excEnergies[z][n][e] << " Ene. Bin Witdh: " << binW[z][n][e]
+					<< endl;
+				
 				decayHists[z][n][e]->Write(); // save histograms
 			} // end of excited states
 		} // end of neutron number
 	} // end of proton number
 		
+
+
+	outBinEne.close();
  	talysFile->Close();
  	return;
 }
@@ -173,6 +184,9 @@ unsigned int TalysData::decayParticles(Event& event) {
 			(excEnergies[zNext][nNext][exNext] - binW[zNext][nNext][exNext]) - 
 			sepEnergies[zCur][nCur][pType];
 		double pEnergy = decayRand.Rndm()*(maxEnergy-minEnergy) + minEnergy;
+		// If gamma emission, then gamma energy is determined by actual excited state difference
+		// (As in do not use bin width based randomization of emitted particle energy)
+		if(pType==0) pEnergy = excEnergies[zCur][nCur][exCur] - excEnergies[zNext][nNext][exNext]; 
 		
 		if ( pEnergy<=0 ) { // Warning if KE< 0...
 			cout << " ***** WARNING: KINETIC ENERGY FOUND TO BE NEGATIVE ****************** " << endl;

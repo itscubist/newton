@@ -116,7 +116,16 @@ Xscn::Xscn(string cardName, string material, TFile* outFile) { // Constructor
 	// Lepton Energy and Direction Distribution Filled
 	leptonDirEnergyDist = new TH3D((TString)strName+"_leptonDir","Lepton Dir & Energy",
 			20,-1,1,12,0,360,100,0,100);
-	gammaEnergyHist = new TH1D((TString)strName+"_gammaE","Total Gamma Energy",50,0,50);
+	gammaEnergyHist = new TH1D((TString)strName+"_gammag","Total Gamma Energy",50,0,50);
+	gammaIndEnergyHist = new TH1D((TString)strName+"_gammaInd","Individual Gamma Energy",200,0,20);
+	//if(inFinalStates > 1)
+		for (int ex = 0; ex < nFinalStates; ex++) { // loop over excited states
+			TString tempExName = Form("_ExState%d",ex);
+			TH1D* gammaIndEnergyByExcHistVecTemp =  
+				new TH1D((TString)strName+tempExName+"_gammaInd","Individual Gamma Energy",100,0,20);	
+			gammaIndEnergyByExcHistVec.push_back(gammaIndEnergyByExcHistVecTemp);
+		}
+	//}
 	neutronNumberHist = new TH1D((TString)strName+"_neutronN","Total Neutron Number",10,-0.5,9.5);
 }
 

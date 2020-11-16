@@ -70,7 +70,7 @@ Organizer::Organizer(string cardName) {
 		ofstream outText(vectorFileName); // open and close file to clear it, before append
 		outText.close(); // close file
 	}
-
+	gRandom->SetSeed(0);
 }
 
 
@@ -107,15 +107,17 @@ void Organizer::generateEvents() {
 			  //Event tempEvent(xscns[xCtr]->genEnergies[eCtr],tempX,tempF,tempD);
 				Event tempEvent(xscns[xCtr]->genEnergies[eCtr],*xscns[xCtr],*fluxes[fCtr],*detector);
 				
-				// If can decay, and decay is requested
+				// If can decay, and decay is requested, make the decay
 				if(xscns[xCtr]->nFinalStates>1 && xscns[xCtr]->decayFinal0==true) {
 					xscns[xCtr]->talysDecayer.decayParticles(tempEvent);
 				}
-				if(eCtr%1000==0) {
+
+				if(eCtr%1000==0) { // to track progress of the generator
 					cout << "Simulating Event: " << eCtr+1 << "/" << 
 						xscns[xCtr]->genEnergies.size() << " of xscn: " <<
 						xscns[xCtr]->strName << endl;
 				}
+
 				if(!batchMode) events.push_back(tempEvent); // if not batch mode store event
 				if(batchMode) { // if batch mode save event now
 					ofstream outText(vectorFileName, ofstream::app); // open file and append
@@ -128,8 +130,19 @@ void Organizer::generateEvents() {
 				double tempEne = tempEvent.particles[0].energy;
 				// Fill TH3D of electron
 				xscns[xCtr]->leptonDirEnergyDist->Fill(tempCosZen,tempAzi,tempEne);
-				xscns[xCtr]->gammaEnergyHist->Fill(tempEvent.totalGammaEnergy);
-				xscns[xCtr]->neutronNumberHist->Fill(tempEvent.totalNeutrons);
+				xscns[xCtr]->gammaEnergyHist->Fill(tempEvent.totalGammaEnergy); // fill total gamma ene
+				
+				for(unsigned int pCtr=0; pCtr < tempEvent.particles.size(); pCtr++) {
+					if(tempEvent.particles[pCtr].pdgId == 22) { // fill ind gamma ene
+						xscns[xCtr]->gammaIndEnergyHist->Fill(tempEvent.particles[pCtr].energy);
+						//cout << "Filling gamma energy histogram per xscn per exc state: " 
+						//	<< tempEvent.xscnExState << endl;
+						xscns[xCtr]->gammaIndEnergyByExcHistVec[tempEvent.xscnExState]->
+							Fill(tempEvent.particles[pCtr].energy);
+					}
+				}
+				
+				xscns[xCtr]->neutronNumberHist->Fill(tempEvent.totalNeutrons); // fill neutron number
 			}
 		} // end of loop over xscns
 		eventCounts.push_back(tempVecEv); // save event counts per flux
@@ -213,7 +226,13 @@ void Organizer::plotHists() {
 		xscns[xCtr]->eventsVsEnergy->Write();
 		xscns[xCtr]->leptonDirEnergyDist->Write();
 		xscns[xCtr]->gammaEnergyHist->Write();
+		xscns[xCtr]->gammaIndEnergyHist->Write();
+		for(unsigned int exCtr=0; exCtr<xscns[xCtr]->nFinalStates; exCtr++) {
+			xscns[xCtr]->gammaIndEnergyByExcHistVec[exCtr]->Write();
+		}
 		xscns[xCtr]->neutronNumberHist->Write();
+		
+		// Projecting 3d lepton hist
 		hZen = xscns[xCtr]->leptonDirEnergyDist->
 				ProjectionX(zenName + (TString)xscns[xCtr]->strName,1,12,0,100,"e");
 		//hZen->GetXaxis()->SetTitle("Lepton Energy (MeV)");
