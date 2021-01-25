@@ -13,7 +13,7 @@ TARGET = newtonRun
 
 #Compiler flags
 # Enable Root Usage, Include Headers, Usage of Fortran Code in C++
-CXXFLAGS = `root-config --libs --cflags` -I$(INCDIR) -lgfortran
+CXXFLAGS = `root-config --libs --cflags` -I$(INCDIR) -lgfortran -no-pie -fPIC -fpermissive
 FCCFLAGS = -I$(TALYS)/source/
 
 DEPS = xscn.h flux.h detector.h event.h exstates.h global.h organizer.h $(TALYS)/source/talys.cmb
