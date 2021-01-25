@@ -14,8 +14,10 @@ DETCARD detData/cardGenericWater.txt
 # OUTPUT NAMES
 # Output root file name
 ROOTFILENAME rootOut/genH2O_ibd_10000.root 
+#ROOTFILENAME rootOut/dummy.root 
 # Vector File Name
 VECTORFILENAME kinOut/genH2O_ibd_10000.kin
+#VECTORFILENAME kinOut/dummy.kin
 # CONDITIONS FOR OUTPUT
 # max lepton energy condition
 MAXLEPTONENERGY 100

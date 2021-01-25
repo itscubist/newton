@@ -12,10 +12,10 @@ MATERIAL WATER
 MOLARMASS 18.01528
 # Density of material In (metric)tons/m^3 -> equal to g/cm^3 too
 DENSITY 1.0
-# Mass of the detector in Tons (NOT KiloTons, NOT Kilograms) (fiducial mass in this case)
-DETMASS 22500.0
+# Mass of the detector in Metric Tons (NOT KiloTons, NOT Kilograms) (full ID volume for SK)
+DETMASS 32000.0
 # Simulation Time (in Years)
-DETYEARS 500.0
+DETYEARS 5000.0
 # Years to Seconds Ratio (divided by 10^7)
 SECONDSINYEAR 3.1557600
 # For precision reasons, Xscn is multiplied by 10^38, nAvo by 10^-23, years/seconds by 10^-7  
@@ -26,7 +26,8 @@ UNITFIXER 0.01
 # if negative then Poisson, else fixed number of events for each xscn, the number below
 # is that fixed number of events, ex: If you want to create N events of all interactions,
 # regardless of how many there will be physically, set it to N...
-FIXEDEVENTCOUNT -1
+# if exactly 0, then event count is from det/xscn/flux info, but no Poisson fluctuations
+FIXEDEVENTCOUNT 0
 # If set (non-zero) then event vertices will all be at 0,0,0
 DETCENTERONLY 0
 # Detector geometry, supported options are: "RECTANGULAR", "CYLINDRICAL" and "SPHERICAL"
@@ -34,8 +35,12 @@ DETGEOM CYLINDRICAL
 # Detector Dimensions (give x,y,z for rectangular; z,r for cylenderic; and only r for spheric)
 DETX 0
 DETY 0
-DETZ 3220.0
-DETR 1490.0
+# Full ID
+DETZ 3620.0
+DETR 1690.0
+# If wall>200 FV only
+# DETZ 3220.0
+# DETR 1490.0
 # DETZ and DETR were put to be fiducial sizes wall-200, might update to wall-100 with based on
 # recent developments, then also need to update detector mass
 # Alternatively, one can make the code calculate mass from detector size and density

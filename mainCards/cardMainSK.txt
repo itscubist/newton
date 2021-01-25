@@ -11,17 +11,24 @@ DETCARD detData/cardSuperK.txt
 # XSCN CARDS TO USE (all entered channels available in detector material will be considered)
 01_XSCNCARD xscnData/cardNueO16.txt
 02_XSCNCARD xscnData/cardNuebarO16.txt
-03_XSCNCARD xscnData/cardNueEs.txt
-04_XSCNCARD xscnData/cardNuebarEs.txt
-05_XSCNCARD xscnData/cardNuxEs.txt
-06_XSCNCARD xscnData/cardNuxbarEs.txt
+#03_XSCNCARD xscnData/cardNueEs.txt
+#04_XSCNCARD xscnData/cardNuebarEs.txt
+#05_XSCNCARD xscnData/cardNuxEs.txt
+#06_XSCNCARD xscnData/cardNuxbarEs.txt
 07_XSCNCARD xscnData/cardIbd.txt
 #
+# Nuance Code should be written to kin file or not?
+NUANCECODE_ON 1
+# Turn on if simulating a lot of events (eg: >50000 events) 
+# to save events as they are created instead of storing them in memory (might mess up plots though)
+BATCHMODE_ON 0
+# Whether there should be a separate file with only true neutrino info
+SEPTRUENU 0
 # OUTPUT NAMES
 # Output root file name
-ROOTFILENAME rootOut/skAtmospheric200MeV.root 
+ROOTFILENAME rootOut/sk_all_5000years_forIndGamma.root 
 # Vector File Name
-VECTORFILENAME kinOut/skAtmospheric200MeV.kin
+VECTORFILENAME kinOut/sk_all_5000years_forIndGamma.kin
 # CONDITIONS FOR OUTPUT
 # max lepton energy condition
 MAXLEPTONENERGY 100

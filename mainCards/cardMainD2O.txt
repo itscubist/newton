@@ -14,6 +14,8 @@ DETCARD detData/cardCoherentD2O.txt
 # OUTPUT NAMES
 # Output root file name
 ROOTFILENAME rootOut/coherentD2O_nue16O_10000.root 
+# Whether there should be a separate file with only true neutrino info
+SEPTRUENU 0
 # Vector File Name
 VECTORFILENAME kinOut/coherentD2O_nue16O_10000.kin
 # CONDITIONS FOR OUTPUT

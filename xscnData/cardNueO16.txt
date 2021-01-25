@@ -9,6 +9,9 @@ WATERPERMOLECULE 1
 HEAVYWATERPERMOLECULE 1
 # Possible Number of Final States
 FINALSTATES 42
+# Nuance Code of interactions (Can be added to kinFile, >99 is for proton decay and hence
+# available, most others are already taken...)
+NUANCECODE 94
 # Target PDG No
 PDGT 1000080160
 # Final Hadron PDG No (0 if notexistent)
