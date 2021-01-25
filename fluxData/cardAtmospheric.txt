@@ -28,17 +28,18 @@ ENERGY 100
 # Maximum energy for constantAlongEnergy option
 ENERGYMAX 100
 # Angular Bins [cos(thetha)] Supplied
-ANGBINS 20
+ANGBINS 100
 # Azimuth Angle Bins Supplied in phi
 AZIBINS 12
 # Energy Bins Supplied (How many rows of info)
 ENERGYBINS 501
 # Flux Data File When Reading From a *.root or *.txt File
-FILENAME fluxData/Honda3DFlux2011to200MeV_20zenBin.root
+FILENAME fluxData/Honda3DFlux2011to200MeV_100zenBin.root
+#FILENAME fluxData/HondaStopMuDecay200MeV_100ZenBin.root
 # TH3D Histogram Names For Flavors in the supplied rootfile
-H_NUE flux_flavor12_osc1_sol1
-H_NUMU flux_flavor14_osc1_sol1
-H_NUTAU flux_flavor16_osc1_sol1
-H_NUEBAR flux_flavor-12_osc1_sol1
-H_NUMUBAR flux_flavor-14_osc1_sol1
-H_NUTAUBAR flux_flavor-16_osc1_sol1
+H_NUE flux_flavor12_osc0_sol0
+H_NUMU flux_flavor14_osc0_sol0
+H_NUTAU flux_flavor16_osc0_sol0
+H_NUEBAR flux_flavor-12_osc0_sol0
+H_NUMUBAR flux_flavor-14_osc0_sol0
+H_NUTAUBAR flux_flavor-16_osc0_sol0
