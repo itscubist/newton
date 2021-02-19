@@ -68,6 +68,8 @@ Event::Event(double inEnergy, Xscn &inXscn, Flux &inFlux, Detector &inDet) {
 	fillLeptonDirAndEnergy();
 	// Fill hadron energy and direction if the xscn card asks for hadron output
 	fillHadronDirAndEnergy();
+	// Check Energy Momentum Conservation Based on Leptona nd Hadron Properties
+	checkConservation();
 	
 	//Initialize event totals
 	totalNeutrons = 0;
@@ -121,6 +123,22 @@ void Event::fillHadronDirAndEnergy() {
 	particles[1].direction = combineZenAziDot(fluxCosZen,fluxAzi,cosHadron,aziHadron); 
 	return;
 }
+
+// Check energy momentum conservation by returning initial minus final momentums determined
+void Event::checkConservation() {
+	if(particles[1].mass==0) return;
+	TVector3 nuMom = nuEnergy*nuDir;
+	TVector3 finalMom = particles[0].momentum*particles[0].direction + 
+		particles[1].momentum*particles[1].direction;
+	consEnMom[0] = nuEnergy + initialTargetMass - particles[0].energy - particles[1].energy;
+	TVector3 momDiff = nuMom - finalMom;
+	for (unsigned int i = 1; i < 4; i++) {
+		consEnMom[i] = momDiff(i-1);	
+	}
+
+	return;
+}
+
 
 // Add gamma to a specific direction, at a specific time if so desired
 // if isKE = 1 then energy input is considered kinetic energy
@@ -368,6 +386,8 @@ TVector3 Event::zenAziToDir(double cosZen, double azi, bool isFlux) {
 	if(isFlux==true) dir=-1*dir;
 	return dir;
 }
+
+
 
 // Destructor (commented, use default)
 //Event::~Event() {

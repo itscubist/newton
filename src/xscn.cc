@@ -127,6 +127,12 @@ Xscn::Xscn(string cardName, string material, TFile* outFile) { // Constructor
 		}
 	//}
 	neutronNumberHist = new TH1D((TString)strName+"_neutronN","Total Neutron Number",10,-0.5,9.5);
+	outputCosHist = new TH1D((TString)strName+"_outputCos","Cos Angle Between Products",20,-1,1);
+	for(unsigned int i = 0; i<4; i++) {
+		conserveHist[i] = new TH1D((TString)strName+Form("_enMomCons%d",i),"ConservationChecks",
+				1000,-1,1);
+	}
+
 }
 
 TH1D* Xscn::readXscn() { // Read Single Diff Xscn
@@ -271,7 +277,12 @@ int Xscn::generateEventCountPerEnergy(Flux inFlux, Detector inDet) {
 			//	inFlux.fluxAtEnergy(energy, fCtr) << endl;
 		}
 		// Weigh By How Many Target and How Much Time
+		
+		// UNCOMMENT THIS LINE ONLY IF YOU WANT TO IGNORE SHAPE OF XSCN!!!
+		//poissonPar = (float)maxNuEnergy/(float)nBins;
+		
 		poissonPar*=inDet.overallCoeff*targetPerMolecule;
+		
 		// Fill expected event count per energy histogram (aka. Poisson means)
 		expectedVsEnergy->SetBinContent(bCtr,poissonPar);			
 	}

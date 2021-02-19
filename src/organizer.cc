@@ -143,6 +143,13 @@ void Organizer::generateEvents() {
 				}
 				
 				xscns[xCtr]->neutronNumberHist->Fill(tempEvent.totalNeutrons); // fill neutron number
+				xscns[xCtr]->outputCosHist->Fill( Cos(tempEvent.particles[0].direction.Angle
+							(tempEvent.particles[1].direction) ) ); // fill cos angle between particles
+
+				for(unsigned int i = 0; i<4; i++) { // Check conservation of energy and momentum
+					xscns[xCtr]->conserveHist[i]->Fill(tempEvent.consEnMom[i]);
+				}
+				
 			}
 		} // end of loop over xscns
 		eventCounts.push_back(tempVecEv); // save event counts per flux
@@ -158,10 +165,34 @@ void Organizer::saveEvents() {
 	rootOutFile->cd();
 	//genTree = new TTree("genTree","tree containing all created event info");
   //genTree->Branch("xscnName",tempEvent,"eventNo/C");
+	
+	// Output to file to check energy conservation temporarily
+	/*
+	ofstream checkFile("checkConservationIBD.dat");
+	for (int eCtr = 0; eCtr < events.size(); eCtr++) {
+		checkFile << events[eCtr].nuEnergy << " " << events[eCtr].nuDir.X() << " " << 
+						events[eCtr].nuDir.Y() << " " << events[eCtr].nuDir.Z() << " " 
+		 				<< events[eCtr].particles[0].energy << " " << 
+		 				events[eCtr].particles[0].direction.X() << " " <<
+		 				events[eCtr].particles[0].direction.Y() << " " << 
+		 				events[eCtr].particles[0].direction.Z() << " "
+		 				<< events[eCtr].particles[1].energy << " " << 
+		 				events[eCtr].particles[1].direction.X() << " " <<
+		 				events[eCtr].particles[1].direction.Y() << " " << 
+		 				events[eCtr].particles[1].direction.Z() << " "
+		 				<< events[eCtr].consEnMom[0] << " " << events[eCtr].consEnMom[1] << " " 
+		 				<< events[eCtr].consEnMom[2] << " " << events[eCtr].consEnMom[3] << endl;
+
+	}
+	checkFile.close();	
+	*/
+	// Write events in NUANCE FORMAT
 	for (int eCtr = 0; eCtr < events.size(); eCtr++) {
 		events[eCtr].writeEvent(outText, nuanceCodeOn);
+		
 	}
 	outText.close();
+	
 	if(sepTrueNu) {
 		ofstream outTrue(vectorFileName+".trueNu");
 		for (int eCtr = 0; eCtr < events.size(); eCtr++) events[eCtr].writeNuInfo(outTrue);
@@ -213,6 +244,7 @@ void Organizer::plotHists() {
 	rSphTestH->Write();
 	
 	// Write xscn graphs
+	TString momConsNames[4] = {"Energy","Mom X","Mom Y","Mom Z"};
 	for (unsigned int xCtr = 0; xCtr < xscns.size(); xCtr++) {
 		if(xscns[xCtr]->nFinalStates>1) xscns[xCtr]->excProbVsEnergy->Write();
 		xscns[xCtr]->xscnVsEnergy->SetLineWidth(2);
@@ -231,6 +263,12 @@ void Organizer::plotHists() {
 			xscns[xCtr]->gammaIndEnergyByExcHistVec[exCtr]->Write();
 		}
 		xscns[xCtr]->neutronNumberHist->Write();
+		xscns[xCtr]->outputCosHist->Write();
+				
+		for(unsigned int i = 0; i<4; i++) { // Check conservation of energy and momentum
+			xscns[xCtr]->conserveHist[i]->GetXaxis()->SetTitle("Final-Initial "+momConsNames[i]);
+			xscns[xCtr]->conserveHist[i]->Write();
+		}
 		
 		// Projecting 3d lepton hist
 		hZen = xscns[xCtr]->leptonDirEnergyDist->
