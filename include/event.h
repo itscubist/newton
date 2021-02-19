@@ -53,6 +53,7 @@ public:
 	// Lepton is the 0th indice, hadron is the 1st indice, de-excitation stuff is 2nd, 3rd...
 	void fillLeptonDirAndEnergy(); // fill lepton info
 	void fillHadronDirAndEnergy(); // fill hadron info if simulated
+	void checkConservation();
 	// Decides on neutrino flavor of the interaction based on flux/xscn of the event
 	void selectNuFlv(Xscn &inXscn, Flux &inFlux);
 	// add particles with given properties for de-excitation

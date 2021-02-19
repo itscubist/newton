@@ -83,6 +83,8 @@ public:
 	TH1D* gammaIndEnergyHist;
 	std::vector<TH1D*> gammaIndEnergyByExcHistVec;
 	TH1D* neutronNumberHist;
+	TH1D* outputCosHist;
+	TH1D* conserveHist[4];
 
 	// RNG
 	TRandom3 xscnRand; 
