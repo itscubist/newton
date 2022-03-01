@@ -37,7 +37,8 @@ NUTAU 0
 NUTAUBAR 0
 # Max Neutrino Energy Considered (even if flux and xscn data extends to higher energyies,
 # interactions will be cut at this energy)
-MAXNUENERGY 132.0
+#MAXNUENERGY 132.0
+MAXNUENERGY 200.0
 # Is Double Differential Info Supplied
 DOUBLEDIFF 1
 # Angular Bins [cos(thethaNue)] Supplied
@@ -53,7 +54,7 @@ XSCNDATA xscnData/nuebarO16xscn200.txt
 # Excited State Info File (Excitation Energy, Nuclear Spin, Parity)
 EXCLEVELDATA xscnData/nuebarOxygenExcitedStates.txt
 # Probability of Excitation
-EXCPROBDATA xscnData/nuebarO16exProb.txt
+EXCPROBDATA xscnData/nuebarO16exProb200.txt
 # Angular Xscn Data per Final State (so 01 is final state with lowest energy...)
 # Expected to have a file for each excited state and in order!!!
 01_ANGXSCNDATA xscnData/nuebarO16_ex1.txt
