@@ -55,9 +55,13 @@ void TalysData::runTalys() { // runs TALYS for with given configuration
 	char inputfilename[64] = "talysInterface/talysinput";
 	char projectile = '0';
 	int tarZ = xscn->zFinalNuc, tarA = xscn->aFinalNuc;
+	cout << "runTALYS 1" << endl;
 	machine_();
+	cout << "runTALYS 2" << endl;
 	constants_();
+	cout << "runTALYS 3" << endl;
 	talysinputcread_(inputfilename,&projectile,&tarZ,&tarA);
+	cout << "runTALYS 4" << endl;
 	for(unsigned int sCtr = 0; sCtr < xscn->excLevels.size(); sCtr++) {
 		int parity = xscn->excLevels[sCtr].parity;	
 		float energy = static_cast<float>(xscn->excLevels[sCtr].energyGnd);	
@@ -65,7 +69,9 @@ void TalysData::runTalys() { // runs TALYS for with given configuration
 		float popValue = 1.0; // this is just a normalization issue...
 		inputsetexenes_(&energy, &spin, &parity, &popValue);
 	}
+	cout << "runTALYS 5" << endl;
 	talysinitial_(); 
+	cout << "runTALYS 6" << endl;
 	talysreaction_();
 	return;
 }

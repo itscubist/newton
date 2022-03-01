@@ -99,10 +99,14 @@ Xscn::Xscn(string cardName, string material, TFile* outFile) { // Constructor
 		cout << "Reading Probabilities of Each Excited State As a Function of Energy" << endl;
 		excProbVsEnergy = readExcProb();
 	  if(decayFinal0 == true) { // If decay is simulated, then run TALYS to get decay probs.
+	  	cout << "Setting up TALYS" << endl;
 			talysDecayer.runTalys(); // run TALYS
+			cout << "Run TALYS called" << endl;
 			//talysDecayer.textOutput(); // for testing access
 			talysDecayer.setFileName("talysInterface/talysOutputs/"+(TString)strName+"_decay.root");
+			cout << "TALYS Output Filename Set" << endl;
 			talysDecayer.initHists(); // init histograms based on TALYS output size
+			cout << "TALYS Histograms Initialized" << endl;
 		}
 	}
 	if(nFinalStates==1) { // Fill the ground state with the given mass in xscn card
@@ -112,6 +116,7 @@ Xscn::Xscn(string cardName, string material, TFile* outFile) { // Constructor
 		excLevels.push_back(excLevel0);
 	}
 
+	cout << "Initializing up basic output histograms" << endl;
 	xscnRand.SetSeed(0);
 	// Lepton Energy and Direction Distribution Filled
 	leptonDirEnergyDist = new TH3D((TString)strName+"_leptonDir","Lepton Dir & Energy",
@@ -182,7 +187,7 @@ TH2D* Xscn::readExcProb() { // Read Exc Prob vs Energy, Call only if nFinalState
 	string line;
 	getline(inFile,line);
 	TH2D* excProbH = new TH2D((TString)(strName)+"_excProbH",(TString)strExcProb, // Declare Hist
-			energyBins2,0.5,(double)(energyBins2)+0.5,nFinalStates,-0.5,(double)(nFinalStates)-0.5); 
+			energyBins,0.5,(double)(energyBins)+0.5,nFinalStates,-0.5,(double)(nFinalStates)-0.5); 
 	while(!inFile.eof()){
 		double tEne;
 		inFile >> tEne;
