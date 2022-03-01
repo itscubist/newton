@@ -1,0 +1,19 @@
+Here are codes required to interface with already installed TALYS:
+
+So install TALYS first: https://tendl.web.psi.ch/tendl_2019/talys.html
+Follow the instructions and set $TALYS = ..
+
+Here is mine:
+$TALYS/source = /media/cubist/files/all/duke_research/tools/talys/talys/source
+
+For this directory compile via:
+
+cd talysInterface/source
+gfortran -I$TALYS/source *.f
+mv *.f ../obj
+
+Basically first go to the source directory, then compile with your fortran compiler (sam you
+used for preparing TALYS), then copy the object files to talysInterface/obj
+
+Main NEWTON installation will use these codes, after this NEWTON installation is easy:
+make newtonRun
